@@ -56,7 +56,7 @@ body::before {
 ::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--bg-4); }
 
-.app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+.app { position: relative; z-index: 1; max-width: 1440px; margin: 0 auto; padding: 0 28px; }
 
 /* ── TOPBAR ── */
 .topbar {
@@ -67,7 +67,7 @@ body::before {
   margin: 0 -28px 0 -28px; padding: 0 28px;
 }
 [data-theme="light"] .topbar { background: rgba(250,248,243,0.88); }
-.topbar-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 16px; height: 60px; }
+.topbar-inner { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; gap: 16px; height: 60px; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; letter-spacing: -0.01em; color: var(--t-1); white-space: nowrap; }
 .brand-logo { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--a) 0%, var(--a-2) 100%); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; color: white; font-weight: 600; font-size: 14px; font-style: italic; }
 .brand-sub { color: var(--t-3); font-weight: 400; font-style: italic; font-size: 14px; }
@@ -94,15 +94,12 @@ body::before {
 .panel-sub { font-size: 14px; color: var(--t-3); margin-bottom: 28px; font-weight: 300; }
 
 /* ── SIMULATOR ── */
-.sim-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; align-items: start; }
-@media (max-width: 900px) { .sim-grid { grid-template-columns: 1fr; } }
+.sim-grid { display: grid; grid-template-columns: 1.1fr 0.9fr 1fr; gap: 14px; align-items: start; }
+@media (max-width: 1200px) { .sim-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 800px) { .sim-grid { grid-template-columns: 1fr; } }
 
-.sim-left { position: sticky; top: 70px; align-self: start; display: flex; flex-direction: column; gap: 14px; max-height: calc(100vh - 80px); overflow-y: auto; scrollbar-width: thin; }
-@media (max-width: 900px) { .sim-left { position: static; max-height: none; overflow-y: visible; } }
-.sim-left::-webkit-scrollbar { width: 5px; }
-.sim-left::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
-
-.sim-canvas { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 20px; }
+.sim-canvas { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 16px; position: sticky; top: 70px; }
+@media (max-width: 1200px) { .sim-canvas { position: static; } }
 .sim-canvas svg { width: 100%; height: auto; display: block; }
 
 .sim-status { margin-top: 14px; padding: 12px 14px; border-radius: var(--r-md); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; transition: all 0.3s; }
@@ -111,7 +108,10 @@ body::before {
 .sim-status.err { background: rgba(248,113,113,0.10); border: 1px solid rgba(248,113,113,0.25); color: var(--err); }
 .sim-status-icon { width: 18px; height: 18px; flex-shrink: 0; }
 
-.sim-controls { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 22px 24px; }
+.sim-controls { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 22px 20px; position: sticky; top: 70px; max-height: calc(100vh - 80px); overflow-y: auto; scrollbar-width: thin; }
+.sim-controls::-webkit-scrollbar { width: 5px; }
+.sim-controls::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
+@media (max-width: 1200px) { .sim-controls { position: static; max-height: none; overflow-y: visible; } }
 .sim-section { margin-bottom: 22px; }
 .sim-section:last-child { margin-bottom: 0; }
 .sim-section-h { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--t-3); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
@@ -133,7 +133,10 @@ body::before {
 .sim-mode-btn { flex: 1; background: none; border: none; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--t-2); padding: 7px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .sim-mode-btn.active { background: var(--bg-3); color: var(--a); }
 
-.sim-results { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 18px 20px; }
+.sim-results { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 18px 16px; position: sticky; top: 70px; max-height: calc(100vh - 80px); overflow-y: auto; scrollbar-width: thin; }
+.sim-results::-webkit-scrollbar { width: 5px; }
+.sim-results::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
+@media (max-width: 1200px) { .sim-results { position: static; max-height: none; overflow-y: visible; } }
 .sim-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .sim-result-tile { background: var(--bg-1); border: 1px solid var(--b-1); border-radius: var(--r-md); padding: 14px 16px; }
 .sim-result-tile.full { grid-column: 1 / -1; }
@@ -219,9 +222,6 @@ footer .heart { color: var(--a); }
 
   <div class="sim-grid">
 
-    <!-- ─── LEFT: DIAGRAM + RESULTS (sticky) ─── -->
-    <div class="sim-left">
-
     <!-- ─── CANVAS (SVG) ─── -->
     <div class="sim-canvas">
       <svg viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg" id="svgSim">
@@ -303,79 +303,17 @@ footer .heart { color: var(--a); }
       </div>
     </div>
 
-      <!-- Resultados -->
-      <div class="sim-results">
-        <div class="sim-section-h" style="margin-bottom:14px">Resultados energéticos</div>
-        <div class="sim-result-grid">
-          <div class="sim-result-tile">
-            <div class="sim-result-label" id="lblResEtaReal">η real (W/Q_H)</div>
-            <div class="sim-result-val" id="resEtaReal">40,0<span class="unit">%</span></div>
-          </div>
-          <div class="sim-result-tile">
-            <div class="sim-result-label" id="lblResEtaCarnot">η Carnot (límite)</div>
-            <div class="sim-result-val" id="resEtaCarnot">50,0<span class="unit">%</span></div>
-          </div>
-          <div class="sim-result-tile">
-            <div class="sim-result-label" id="lblResQL">Q_L cedido</div>
-            <div class="sim-result-val" id="resQL">600<span class="unit">kJ</span></div>
-          </div>
-          <div class="sim-result-tile">
-            <div class="sim-result-label" id="lblResRatio">η real / η Carnot</div>
-            <div class="sim-result-val" id="resRatio">80<span class="unit">%</span></div>
-          </div>
-        </div>
-
-        <div class="sim-section-h" style="margin:22px 0 14px">Balance de exergía</div>
-
-        <div class="exergy-bars" id="exergyBars">
-          <div class="exergy-bar-row">
-            <span class="exergy-bar-label">ΔX fuente caliente</span>
-            <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill neg" id="bFH" style="width:0;right:50%"></div></div>
-            <span class="exergy-bar-val" id="vFH">−</span>
-          </div>
-          <div class="exergy-bar-row">
-            <span class="exergy-bar-label">ΔX receptor de W</span>
-            <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill pos" id="bW" style="width:0;left:50%"></div></div>
-            <span class="exergy-bar-val" id="vW">−</span>
-          </div>
-          <div class="exergy-bar-row">
-            <span class="exergy-bar-label">ΔX fuente fría</span>
-            <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill pos" id="bFL" style="width:0;left:50%"></div></div>
-            <span class="exergy-bar-val" id="vFL">−</span>
-          </div>
-        </div>
-
-        <div class="sim-result-grid" style="margin-top:18px">
-          <div class="sim-result-tile full">
-            <div class="sim-result-label">ΔX universo (suma)</div>
-            <div class="sim-result-val" id="resDXU">0<span class="unit">kJ</span></div>
-            <div class="sim-result-extra" id="resDXUextra">2° principio: ΔX_U ≤ 0</div>
-          </div>
-          <div class="sim-result-tile">
-            <div class="sim-result-label">Destrucción de exergía</div>
-            <div class="sim-result-val" id="resDestr">0<span class="unit">kJ</span></div>
-          </div>
-          <div class="sim-result-tile">
-            <div class="sim-result-label">Rendimiento exergético</div>
-            <div class="sim-result-val" id="resEtaX">100<span class="unit">%</span></div>
-          </div>
-        </div>
-
-      </div>
-    </div><!-- /sim-left -->
-
     <!-- ─── CONTROLS ─── -->
-    <div>
-      <div class="sim-controls">
+    <div class="sim-controls">
 
-        <!-- Modo -->
-        <div class="sim-section">
-          <div class="sim-section-h">Modo de operación</div>
-          <div class="sim-mode">
-            <button class="sim-mode-btn active" data-mode="real">Real (defino W)</button>
-            <button class="sim-mode-btn" data-mode="carnot">Carnot (W = η_C · Q_H)</button>
-          </div>
+      <!-- Modo -->
+      <div class="sim-section">
+        <div class="sim-section-h">Modo de operación</div>
+        <div class="sim-mode">
+          <button class="sim-mode-btn active" data-mode="real">Real (defino W)</button>
+          <button class="sim-mode-btn" data-mode="carnot">Carnot (W = η_C · Q_H)</button>
         </div>
+      </div>
 
         <!-- Fuente caliente -->
         <div class="sim-section">
@@ -456,10 +394,69 @@ footer .heart { color: var(--a); }
           </div>
         </div>
 
-      </div>
     </div>
 
-  </div>
+    <!-- ─── RESULTS ─── -->
+    <div class="sim-results">
+      <div class="sim-section-h" style="margin-bottom:14px">Resultados energéticos</div>
+      <div class="sim-result-grid">
+        <div class="sim-result-tile">
+          <div class="sim-result-label" id="lblResEtaReal">η real (W/Q_H)</div>
+          <div class="sim-result-val" id="resEtaReal">40,0<span class="unit">%</span></div>
+        </div>
+        <div class="sim-result-tile">
+          <div class="sim-result-label" id="lblResEtaCarnot">η Carnot (límite)</div>
+          <div class="sim-result-val" id="resEtaCarnot">50,0<span class="unit">%</span></div>
+        </div>
+        <div class="sim-result-tile">
+          <div class="sim-result-label" id="lblResQL">Q_L cedido</div>
+          <div class="sim-result-val" id="resQL">600<span class="unit">kJ</span></div>
+        </div>
+        <div class="sim-result-tile">
+          <div class="sim-result-label" id="lblResRatio">η real / η Carnot</div>
+          <div class="sim-result-val" id="resRatio">80<span class="unit">%</span></div>
+        </div>
+      </div>
+
+      <div class="sim-section-h" style="margin:22px 0 14px">Balance de exergía</div>
+
+      <div class="exergy-bars" id="exergyBars">
+        <div class="exergy-bar-row">
+          <span class="exergy-bar-label">ΔX fuente caliente</span>
+          <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill neg" id="bFH" style="width:0;right:50%"></div></div>
+          <span class="exergy-bar-val" id="vFH">−</span>
+        </div>
+        <div class="exergy-bar-row">
+          <span class="exergy-bar-label">ΔX receptor de W</span>
+          <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill pos" id="bW" style="width:0;left:50%"></div></div>
+          <span class="exergy-bar-val" id="vW">−</span>
+        </div>
+        <div class="exergy-bar-row">
+          <span class="exergy-bar-label">ΔX fuente fría</span>
+          <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill pos" id="bFL" style="width:0;left:50%"></div></div>
+          <span class="exergy-bar-val" id="vFL">−</span>
+        </div>
+      </div>
+
+      <div class="sim-result-grid" style="margin-top:18px">
+        <div class="sim-result-tile full">
+          <div class="sim-result-label">ΔX universo (suma)</div>
+          <div class="sim-result-val" id="resDXU">0<span class="unit">kJ</span></div>
+          <div class="sim-result-extra" id="resDXUextra">2° principio: ΔX_U ≤ 0</div>
+        </div>
+        <div class="sim-result-tile">
+          <div class="sim-result-label">Destrucción de exergía</div>
+          <div class="sim-result-val" id="resDestr">0<span class="unit">kJ</span></div>
+        </div>
+        <div class="sim-result-tile">
+          <div class="sim-result-label">Rendimiento exergético</div>
+          <div class="sim-result-val" id="resEtaX">100<span class="unit">%</span></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /sim-grid -->
 
   <!-- Notas didácticas -->
   <div class="theory-card" style="margin-top:18px">
