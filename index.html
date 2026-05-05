@@ -182,9 +182,30 @@ body::before {
 
 .formula-inline { font-family: 'JetBrains Mono', monospace; font-size: 0.92em; background: var(--bg-3); padding: 1px 5px; border-radius: 3px; color: var(--a-2); }
 
+/* ── FORMULA BLOCKS ── */
+.t-eq { display: block; background: var(--bg-1); border: 1px solid var(--b-1); border-radius: var(--r-md); padding: 14px 18px; margin: 12px 0; text-align: center; position: relative; }
+.t-eq-cap { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--t-3); font-weight: 500; margin-bottom: 8px; text-align: left; }
+
+/* ── FORMULA DISPLAY ── */
+.formula-math { font-family: 'Fraunces', serif; font-size: 18px; color: var(--t-1); letter-spacing: 0.01em; line-height: 1.8; }
+.formula-math .var { font-style: italic; }
+.formula-math .sub { font-size: 0.7em; vertical-align: sub; line-height: 0; }
+.formula-math .op { color: var(--t-2); padding: 0 2px; }
+.formula-math .eq { color: var(--a); padding: 0 4px; }
+.formula-math .bracket { color: var(--t-3); }
+.formula-math .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; position: relative; top: -2px; }
+.formula-math .frac-num, .formula-math .frac-den { font-size: 0.82em; line-height: 1.2; padding: 0 4px; }
+.formula-math .frac-num { border-bottom: 1.5px solid var(--t-3); padding-bottom: 2px; }
+.formula-math .frac-den { padding-top: 2px; }
+
 /* ── FOOTER ── */
 footer { margin-top: 80px; padding: 40px 0 60px; border-top: 1px solid var(--b-1); display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--t-3); }
 footer .heart { color: var(--a); }
+
+/* ── THEORY GRID ── */
+.theory-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+.theory-grid-2 .full { grid-column: 1 / -1; }
+@media (max-width: 900px) { .theory-grid-2 { grid-template-columns: 1fr; } }
 
 @media (max-width: 600px) {
   .hide-mobile { display: none; }
@@ -219,6 +240,33 @@ footer .heart { color: var(--a); }
 
 <!-- ═══════════════ SIMULADOR ═══════════════ -->
 <section class="panel" id="panel-simulador">
+
+  <!-- Guía rápida -->
+  <div class="theory-card" style="margin-bottom:18px">
+    <div class="theory-body">
+      <div class="t-callout info" style="margin:0 0 18px 0">
+        <div class="t-callout-h">💡 Cómo experimentar con el simulador</div>
+        <div class="t-callout-text">Probá modo <strong>Carnot</strong>: ΔX<sub>U</sub> ≈ 0. Pasá a <strong>Real</strong> y bajá W: aparece destrucción de exergía. Si subís W por encima del límite de Carnot → <strong>imposible</strong> (viola 2° principio). Poné T<sub>L</sub> &gt; T<sub>H</sub>: cambia a <strong>máquina frigorífica</strong> automáticamente. Mové T<sub>0</sub> para ver cómo cambia la exergía de las fuentes.</div>
+      </div>
+      <div class="t-section">
+        <div class="t-section-h">Exergía de cada componente del simulador</div>
+        <ul class="t-list">
+          <li><strong>Fuentes de calor</strong> (caliente o fría): <span class="formula-inline">ΔX = (1 − T<sub>0</sub>/T) · Q</span>, donde Q &gt; 0 si recibe y Q &lt; 0 si cede.</li>
+          <li><strong>Trabajo</strong>: siempre 100% exergía. <span class="formula-inline">ΔX = +W</span> si lo recibe, <span class="formula-inline">−W</span> si lo entrega.</li>
+        </ul>
+      </div>
+      <div class="t-section" style="margin-bottom:0">
+        <div class="t-section-h">Regla conceptual · Exergía por intercambio de calor</div>
+        <ul class="t-list">
+          <li><strong>T &gt; T<sub>0</sub></strong> y recibe calor → <strong>gana</strong> exergía</li>
+          <li><strong>T &gt; T<sub>0</sub></strong> y cede calor → <strong>pierde</strong> exergía</li>
+          <li><strong>T &lt; T<sub>0</sub></strong> y recibe calor → <strong>pierde</strong> exergía</li>
+          <li><strong>T &lt; T<sub>0</sub></strong> y cede calor → <strong>gana</strong> exergía</li>
+        </ul>
+        <p class="t-text" style="margin-top:6px">A T = T<sub>0</sub> el factor (1 − T<sub>0</sub>/T) = 0 → el calor no tiene valor exergético.</p>
+      </div>
+    </div>
+  </div>
 
   <div class="sim-grid">
 
@@ -286,7 +334,7 @@ footer .heart { color: var(--a); }
         <text x="300" y="434" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="13" id="lblTL">T_L = 300 K</text>
         <text x="300" y="450" text-anchor="middle" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" id="lblQL">Q_L recibe 600 kJ</text>
 
-        <!-- Indicadores de exergía -->
+        <!-- Indicadores de exergía (izquierda) -->
         <g id="exergyMarkers">
           <text x="80" y="74" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔX_FH</text>
           <text x="80" y="88" fill="#f87171" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exFH">−500</text>
@@ -294,6 +342,16 @@ footer .heart { color: var(--a); }
           <text x="80" y="259" fill="#4ade80" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exW">+400</text>
           <text x="80" y="424" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔX_FL</text>
           <text x="80" y="438" fill="#60a5fa" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exFL">+4</text>
+        </g>
+
+        <!-- Indicadores de entropía (derecha) -->
+        <g id="entropyMarkers">
+          <text x="520" y="74" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔS_FH</text>
+          <text x="520" y="88" fill="#f87171" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="enFH">−1,67</text>
+          <text x="520" y="245" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔS_W</text>
+          <text x="520" y="259" fill="#4ade80" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="enW">0</text>
+          <text x="520" y="424" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔS_FL</text>
+          <text x="520" y="438" fill="#60a5fa" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="enFL">+2,00</text>
         </g>
       </svg>
 
@@ -401,19 +459,19 @@ footer .heart { color: var(--a); }
       <div class="sim-section-h" style="margin-bottom:14px">Resultados energéticos</div>
       <div class="sim-result-grid">
         <div class="sim-result-tile">
-          <div class="sim-result-label" id="lblResEtaReal">η real (W/Q_H)</div>
+          <div class="sim-result-label" id="lblResEtaReal"><span style="text-transform:none">η</span> real (W/Q<sub>H</sub>)</div>
           <div class="sim-result-val" id="resEtaReal">40,0<span class="unit">%</span></div>
         </div>
         <div class="sim-result-tile">
-          <div class="sim-result-label" id="lblResEtaCarnot">η Carnot (límite)</div>
+          <div class="sim-result-label" id="lblResEtaCarnot"><span style="text-transform:none">η</span> Carnot (límite)</div>
           <div class="sim-result-val" id="resEtaCarnot">50,0<span class="unit">%</span></div>
         </div>
         <div class="sim-result-tile">
-          <div class="sim-result-label" id="lblResQL">Q_L cedido</div>
+          <div class="sim-result-label" id="lblResQL">Q<sub>L</sub> cedido</div>
           <div class="sim-result-val" id="resQL">600<span class="unit">kJ</span></div>
         </div>
         <div class="sim-result-tile">
-          <div class="sim-result-label" id="lblResRatio">η real / η Carnot</div>
+          <div class="sim-result-label" id="lblResRatio"><span style="text-transform:none">η</span> real / <span style="text-transform:none">η</span> Carnot</div>
           <div class="sim-result-val" id="resRatio">80<span class="unit">%</span></div>
         </div>
       </div>
@@ -454,26 +512,148 @@ footer .heart { color: var(--a); }
         </div>
       </div>
 
+      <div class="sim-section-h" style="margin:22px 0 14px">Balance de entropía</div>
+
+      <div class="exergy-bars" id="entropyBars">
+        <div class="exergy-bar-row">
+          <span class="exergy-bar-label">ΔS fuente caliente</span>
+          <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill neg" id="bSFH" style="width:0;right:50%"></div></div>
+          <span class="exergy-bar-val" id="vSFH">−</span>
+        </div>
+        <div class="exergy-bar-row">
+          <span class="exergy-bar-label">ΔS receptor de W</span>
+          <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill" id="bSW" style="width:0"></div></div>
+          <span class="exergy-bar-val" id="vSW">0</span>
+        </div>
+        <div class="exergy-bar-row">
+          <span class="exergy-bar-label">ΔS fuente fría</span>
+          <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill pos" id="bSFL" style="width:0;left:50%"></div></div>
+          <span class="exergy-bar-val" id="vSFL">−</span>
+        </div>
+      </div>
+
+      <div class="sim-result-grid" style="margin-top:18px">
+        <div class="sim-result-tile full">
+          <div class="sim-result-label">ΔS universo (suma)</div>
+          <div class="sim-result-val" id="resDSU">0<span class="unit">kJ/K</span></div>
+          <div class="sim-result-extra">2° principio: ΔS_U ≥ 0</div>
+        </div>
+      </div>
+
     </div>
 
   </div><!-- /sim-grid -->
 
-  <!-- Notas didácticas -->
-  <div class="theory-card" style="margin-top:18px">
-    <div class="theory-body">
-      <div class="t-section">
-        <div class="t-section-h">Cómo se calcula la exergía de cada componente</div>
-        <ul class="t-list">
-          <li><strong>Fuente caliente</strong> (cede Q<sub>H</sub>): pierde exergía. <span class="formula-inline">ΔX<sub>FH</sub> = −(1 − T<sub>0</sub>/T<sub>H</sub>) · Q<sub>H</sub></span>. Cuanto más alta T<sub>H</sub> respecto de T<sub>0</sub>, más exergía pierde por cada kJ de calor entregado.</li>
-          <li><strong>Receptor del trabajo</strong> (recibe W): gana exergía pura. <span class="formula-inline">ΔX<sub>W</sub> = +W</span>. El trabajo es 100% exergía.</li>
-          <li><strong>Fuente fría</strong> (recibe Q<sub>L</sub>): el signo depende. Si T<sub>L</sub> &gt; T<sub>0</sub>, gana exergía positiva pequeña; si T<sub>L</sub> = T<sub>0</sub>, no gana nada (calor a temperatura ambiente, sin valor); si T<sub>L</sub> &lt; T<sub>0</sub>, pierde porque está más cerca del ambiente que antes.</li>
-        </ul>
-      </div>
-      <div class="t-callout info">
-        <div class="t-callout-h">💡 Cómo experimentar</div>
-        <div class="t-callout-text">Empezá moviendo <strong>T<sub>0</sub></strong>: cuando T<sub>0</sub> se acerca a T<sub>H</sub>, la fuente caliente pierde menos exergía (su capacidad de producir trabajo es menor). Probá modo <strong>Carnot</strong>: deberías ver ΔX<sub>U</sub> ≈ 0. Después pasá a <strong>Real</strong> y bajá W: vas a ver cómo aparece destrucción de exergía. Si subís W por encima del límite de Carnot, el sistema marca <strong>imposible</strong> (violaría el 2° principio). <strong>Modo MF:</strong> si ponés T<sub>L</sub> &gt; T<sub>H</sub> el simulador cambia automáticamente a máquina frigorífica — el trabajo W ahora entra al sistema para bombear calor del foco frío al caliente, y los resultados muestran COP en vez de rendimiento.</div>
+  <!-- Teoría oficial · Conceptos para el simulador -->
+  <div class="theory-grid-2">
+
+    <!-- Card 1: Qué es -->
+    <div class="theory-card">
+      <div class="theory-body">
+        <div class="t-section">
+          <div class="t-section-h">¿Qué es la exergía?</div>
+          <p class="t-text">Propiedad que cuantifica la <strong>capacidad de producir trabajo</strong> de un sistema. Es el <em>trabajo útil máximo</em> obtenible si el sistema evoluciona hasta el equilibrio con un estado de referencia (T<sub>0</sub>, P<sub>0</sub>).</p>
+          <p class="t-text">Es una medida del <strong>desequilibrio</strong> con el ambiente: a mayor desequilibrio, mayor exergía.</p>
+        </div>
       </div>
     </div>
+
+    <!-- Card 2: Calor ≠ Trabajo -->
+    <div class="theory-card">
+      <div class="theory-body">
+        <div class="t-section">
+          <div class="t-section-h">¿Por qué calor y trabajo no son iguales?</div>
+          <p class="t-text">El 1° principio iguala todas las energías: <span class="formula-inline">ΔE = Q − W</span>. Pero el 2° principio revela que tienen distinta <strong>calidad</strong>: 1000 kJ de trabajo levantan un peso directamente, mientras que 1000 kJ de calor solo pueden hacerlo parcialmente, y la fracción aprovechable depende de la temperatura de la fuente.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Fórmulas -->
+    <div class="theory-card full">
+      <div class="theory-body">
+        <div class="t-section">
+          <div class="t-section-h">Variación de exergía · Fórmulas clave</div>
+          <div class="t-eq"><span class="t-eq-cap">Sistemas cerrados</span><span class="formula-math">Δ<i>X</i> <span class="eq">=</span> Δ<i>U</i> <span class="op">−</span> <i>T</i><sub>0</sub> · Δ<i>S</i> <span class="op">+</span> <i>p</i><sub>0</sub> · Δ<i>V</i></span></div>
+          <div class="t-eq"><span class="t-eq-cap">Sistemas abiertos estacionarios</span><span class="formula-math">Δ<i>X</i> <span class="eq">=</span> Δ<i>H</i> <span class="op">−</span> <i>T</i><sub>0</sub> · Δ<i>S</i> <span class="op">+</span> Δ<i>E<sub>c</sub></i> <span class="op">+</span> Δ<i>E<sub>p</sub></i></span></div>
+          <div class="t-eq"><span class="t-eq-cap">Universo (sist. aislado: ΔU = 0, ΔV = 0)</span><span class="formula-math">Δ<i>X<sub>U</sub></i> <span class="eq">=</span> <span class="op">−</span><i>T</i><sub>0</sub> · Δ<i>S<sub>U</sub></i> &nbsp; → &nbsp; como Δ<i>S<sub>U</sub></i> ≥ 0, entonces Δ<i>X<sub>U</sub></i> ≤ 0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Porción útil -->
+    <div class="theory-card">
+      <div class="theory-body">
+        <div class="t-section">
+          <div class="t-section-h">Porción útil del calor y del trabajo</div>
+          <p class="t-text">Reemplazando 1° principio en la fórmula de exergía:</p>
+          <div class="t-eq"><span class="t-eq-cap">Exergía desglosada</span><span class="formula-math">Δ<i>X</i> <span class="eq">=</span> <span class="bracket">(</span><i>Q</i> <span class="op">−</span> <i>T</i><sub>0</sub> · Δ<i>S</i><span class="bracket">)</span> <span class="op">−</span> <span class="bracket">(</span><i>W</i> <span class="op">−</span> <i>p</i><sub>0</sub> · Δ<i>V</i><span class="bracket">)</span></span></div>
+          <p class="t-text"><strong>(<i>Q</i> − <i>T</i><sub>0</sub>·Δ<i>S</i>)</strong> = porción útil del calor. <strong>(<i>W</i> − <i>p</i><sub>0</sub>·Δ<i>V</i>)</strong> = porción útil del trabajo.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5: Fuente de T cte -->
+    <div class="theory-card">
+      <div class="theory-body">
+        <div class="t-section">
+          <div class="t-section-h">Exergía de una fuente de T constante</div>
+          <p class="t-text">Variación de exergía de una fuente a temperatura <i>T</i> que intercambia calor <i>Q</i> (positivo si recibe, negativo si cede):</p>
+          <div class="t-eq"><span class="t-eq-cap">Exergía por calor</span><span class="formula-math">Δ<i>X</i> <span class="eq">=</span> <span class="bracket">(</span>1 <span class="op">−</span> <span class="frac"><span class="frac-num"><i>T</i><sub>0</sub></span><span class="frac-den"><i>T</i></span></span><span class="bracket">)</span> · <i>Q</i></span></div>
+          <p class="t-text">El factor cambia de signo según <i>T</i> esté arriba o debajo de <i>T</i><sub>0</sub>. Si <i>T</i> = <i>T</i><sub>0</sub> → exergía cero.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6: MT y MF -->
+    <div class="theory-card">
+      <div class="theory-body">
+        <div class="t-section">
+          <div class="t-section-h">Máquina térmica · Rendimiento de Carnot</div>
+          <div class="t-eq"><span class="t-eq-cap">Rendimiento MT</span><span class="formula-math"><i>η</i> <span class="eq">=</span> <span class="frac"><span class="frac-num"><i>W</i></span><span class="frac-den"><i>Q<sub>H</sub></i></span></span> <span class="eq">=</span> 1 <span class="op">−</span> <span class="frac"><span class="frac-num">|<i>Q<sub>L</sub></i>|</span><span class="frac-den"><i>Q<sub>H</sub></i></span></span></span></div>
+          <div class="t-eq"><span class="t-eq-cap">Límite de Carnot</span><span class="formula-math"><i>η</i><sub>Carnot</sub> <span class="eq">=</span> 1 <span class="op">−</span> <span class="frac"><span class="frac-num"><i>T<sub>L</sub></i></span><span class="frac-den"><i>T<sub>H</sub></i></span></span></span></div>
+        </div>
+        <div class="t-section">
+          <div class="t-section-h">Máquina frigorífica · COP</div>
+          <div class="t-eq"><span class="t-eq-cap">COP</span><span class="formula-math">COP <span class="eq">=</span> <span class="frac"><span class="frac-num"><i>Q<sub>L</sub></i></span><span class="frac-den"><i>W</i></span></span></span></div>
+          <div class="t-eq"><span class="t-eq-cap">COP Carnot</span><span class="formula-math">COP<sub>Carnot</sub> <span class="eq">=</span> <span class="frac"><span class="frac-num"><i>T<sub>L</sub></i></span><span class="frac-den"><i>T<sub>H</sub></i> <span class="op">−</span> <i>T<sub>L</sub></i></span></span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 7: Rendimiento exergético + Entropía -->
+    <div class="theory-card">
+      <div class="theory-body">
+        <div class="t-section">
+          <div class="t-section-h">Rendimiento exergético</div>
+          <div class="t-eq"><span class="t-eq-cap">Rendimiento exergético</span><span class="formula-math"><i>η<sub>X</sub></i> <span class="eq">=</span> <span class="frac"><span class="frac-num">Σ Δ<i>X</i><sub>(+)</sub></span><span class="frac-den">Σ |Δ<i>X</i><sub>(−)</sub>|</span></span></span></div>
+          <p class="t-text">Reversible → <i>η<sub>X</sub></i> = 100%. Irreversible → <i>η<sub>X</sub></i> &lt; 100%.</p>
+        </div>
+        <div class="t-section">
+          <div class="t-section-h">Entropía · Fuente de T constante</div>
+          <div class="t-eq"><span class="t-eq-cap">Variación de entropía</span><span class="formula-math">Δ<i>S<sub>F</sub></i> <span class="eq">=</span> <span class="frac"><span class="frac-num"><i>Q<sub>F</sub></i></span><span class="frac-den"><i>T<sub>F</sub></i></span></span></span></div>
+          <p class="t-text">Donde <i>Q<sub>F</sub></i> &gt; 0 si la fuente recibe calor, &lt; 0 si lo cede. El trabajo no genera variación de entropía (Δ<i>S<sub>W</sub></i> = 0).</p>
+          <div class="t-eq"><span class="t-eq-cap">Segundo principio</span><span class="formula-math">Δ<i>S<sub>U</sub></i> <span class="eq">=</span> Σ Δ<i>S<sub>i</sub></i> <span class="op">≥</span> 0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 8: Criterios de posibilidad -->
+    <div class="theory-card full">
+      <div class="theory-body">
+        <div class="t-section">
+          <div class="t-section-h">Criterios de posibilidad de un proceso</div>
+          <ul class="t-list">
+            <li><strong>1° principio:</strong> Q<sub>H</sub> = W + Q<sub>L</sub> (conservación de la energía).</li>
+            <li><strong>Carnot:</strong> η ≤ η<sub>Carnot</sub> → el trabajo no puede superar el límite reversible.</li>
+            <li><strong>Entropía:</strong> ΔS<sub>U</sub> ≥ 0 → la entropía del universo no puede disminuir.</li>
+            <li><strong>Exergía:</strong> ΔX<sub>U</sub> ≤ 0 → la exergía del universo no puede aumentar.</li>
+            <li><strong>η<sub>X</sub> ≤ 1</strong> → no se puede ganar más exergía de la que se pierde.</li>
+          </ul>
+          <p class="t-text">Cuando el simulador marca <strong>"imposible"</strong>, alguno de estos criterios se viola.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </section>
@@ -603,10 +783,10 @@ function setupSimulator() {
       $('lblWrole').textContent = 'FUENTE W';
       $('lblWrole').setAttribute('fill','#60a5fa');
       $('lblWval').setAttribute('fill','#60a5fa');
-      $('lblResEtaReal').textContent   = 'COP real (Q_L/W)';
-      $('lblResEtaCarnot').textContent = 'COP Carnot (límite)';
-      $('lblResQL').textContent        = 'Q_L absorbido del frío';
-      $('lblResRatio').textContent     = 'COP real / COP Carnot';
+      $('lblResEtaReal').innerHTML   = 'COP real (Q<sub>L</sub>/W)';
+      $('lblResEtaCarnot').innerHTML = 'COP Carnot (límite)';
+      $('lblResQL').innerHTML        = 'Q<sub>L</sub> absorbido del frío';
+      $('lblResRatio').innerHTML     = 'COP real / COP Carnot';
     } else {
       $('secHotLabel').textContent    = 'Fuente caliente';
       $('secColdLabel').textContent   = 'Fuente fría';
@@ -626,10 +806,10 @@ function setupSimulator() {
       $('lblWrole').textContent = 'RECEPTOR';
       $('lblWrole').setAttribute('fill','#4ade80');
       $('lblWval').setAttribute('fill','#4ade80');
-      $('lblResEtaReal').textContent   = 'η real (W/Q_H)';
-      $('lblResEtaCarnot').textContent = 'η Carnot (límite)';
-      $('lblResQL').textContent        = 'Q_L cedido';
-      $('lblResRatio').textContent     = 'η real / η Carnot';
+      $('lblResEtaReal').innerHTML   = '<span style="text-transform:none">η</span> real (W/Q<sub>H</sub>)';
+      $('lblResEtaCarnot').innerHTML = '<span style="text-transform:none">η</span> Carnot (límite)';
+      $('lblResQL').innerHTML        = 'Q<sub>L</sub> cedido';
+      $('lblResRatio').innerHTML     = '<span style="text-transform:none">η</span> real / <span style="text-transform:none">η</span> Carnot';
     }
 
     let W;
@@ -735,6 +915,35 @@ function setupSimulator() {
       const xPerdida_mf = Math.max(0,-dXFL_mf) + Math.max(0,-dXW_mf);
       const etaX_mf = xPerdida_mf > 0 ? xGanada_mf / xPerdida_mf : 0;
       $('resEtaX').innerHTML  = `${(etaX_mf*100).toFixed(1).replace('.',',')}<span class="unit">%</span>`;
+
+      // ── Entropía MF ──
+      const dSFH_mf = QHmf / T_hot;          // hot source receives QHmf
+      const dSFL_mf = -QL / T_cold;           // cold source cedes QL
+      const dSW_mf  = 0;
+      const dSU_mf  = dSFH_mf + dSFL_mf + dSW_mf;
+
+      $('enFH').textContent = fmtSign(dSFH_mf, 2);
+      $('enFL').textContent = fmtSign(dSFL_mf, 2);
+      $('enW').textContent  = '0';
+
+      const maxS_mf = Math.max(Math.abs(dSFH_mf), Math.abs(dSFL_mf), 0.01);
+      const updateSBarMF = (id, valId, val) => {
+        const bar = $(id), valEl = $(valId);
+        const pct = Math.min(50, Math.abs(val) / maxS_mf * 50);
+        if (val >= 0) {
+          bar.classList.remove('neg'); bar.classList.add('pos');
+          bar.style.left = '50%'; bar.style.right = ''; bar.style.width = pct + '%';
+        } else {
+          bar.classList.remove('pos'); bar.classList.add('neg');
+          bar.style.right = '50%'; bar.style.left = ''; bar.style.width = pct + '%';
+        }
+        valEl.textContent = fmtSign(val, 2) + ' kJ/K';
+      };
+      updateSBarMF('bSFH', 'vSFH', dSFH_mf);
+      updateSBarMF('bSFL', 'vSFL', dSFL_mf);
+      $('bSW').style.width = '0'; $('vSW').textContent = '0 kJ/K';
+      $('resDSU').className = 'sim-result-val ' + (Math.abs(dSU_mf) < 0.001 ? '' : (dSU_mf > 0 ? 'pos' : 'neg'));
+      $('resDSU').innerHTML = `${fmtSign(dSU_mf,2)}<span class="unit">kJ/K</span>`;
 
       const status = $('simStatus'), statusText = $('simStatusText');
       status.classList.remove('ok','warn','err');
@@ -886,6 +1095,35 @@ function setupSimulator() {
       $('resDXU').innerHTML = `${fmtSign(dXU,1)}<span class="unit">kJ</span>`;
       $('resDestr').innerHTML = `${fmt(destruccion,1)}<span class="unit">kJ</span>`;
       $('resEtaX').innerHTML  = `${(etaX*100).toFixed(1).replace('.',',')}<span class="unit">%</span>`;
+
+      // ── Entropía MT ──
+      const dSFH = -QHr / TH;    // hot source cedes QHr
+      const dSFL_mt = QL / TL;    // cold source receives QL
+      const dSW  = 0;
+      const dSU  = dSFH + dSFL_mt + dSW;
+
+      $('enFH').textContent = fmtSign(dSFH, 2);
+      $('enFL').textContent = fmtSign(dSFL_mt, 2);
+      $('enW').textContent  = '0';
+
+      const maxS = Math.max(Math.abs(dSFH), Math.abs(dSFL_mt), 0.01);
+      const updateSBar = (id, valId, val) => {
+        const bar = $(id), valEl = $(valId);
+        const pct = Math.min(50, Math.abs(val) / maxS * 50);
+        if (val >= 0) {
+          bar.classList.remove('neg'); bar.classList.add('pos');
+          bar.style.left = '50%'; bar.style.right = ''; bar.style.width = pct + '%';
+        } else {
+          bar.classList.remove('pos'); bar.classList.add('neg');
+          bar.style.right = '50%'; bar.style.left = ''; bar.style.width = pct + '%';
+        }
+        valEl.textContent = fmtSign(val, 2) + ' kJ/K';
+      };
+      updateSBar('bSFH', 'vSFH', dSFH);
+      updateSBar('bSFL', 'vSFL', dSFL_mt);
+      $('bSW').style.width = '0'; $('vSW').textContent = '0 kJ/K';
+      $('resDSU').className = 'sim-result-val ' + (Math.abs(dSU) < 0.001 ? '' : (dSU > 0 ? 'pos' : 'neg'));
+      $('resDSU').innerHTML = `${fmtSign(dSU,2)}<span class="unit">kJ/K</span>`;
 
       const status = $('simStatus'), statusText = $('simStatusText');
       status.classList.remove('ok','warn','err');
