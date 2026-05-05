@@ -949,12 +949,15 @@ function setupSimulator() {
         if (discrepancia > 0.5) {
           status.classList.add('err');
           statusText.innerHTML = `<strong>MF inconsistente:</strong> con Q<sub>H</sub> = ${fmt(resolvedQH_mf)} kJ y Q<sub>L</sub> = ${fmt(resolvedQL_mf)} kJ, el 1° principio exige W = ${fmt(WimplicadoMF)} kJ, pero W configurado = ${fmt(W)} kJ. Ajustá W o desbloqueá Q<sub>H</sub>/Q<sub>L</sub>.`;
-        } else if (dXU_mf > 0.5) {
+        } else if (W <= 0) {
           status.classList.add('err');
-          statusText.innerHTML = `<strong>MF imposible:</strong> COP (${fmt(COPreal,2)}) supera el límite de Carnot (${fmt(COPcarnot,2)}). Viola el 2° principio (ΔX<sub>U</sub> &gt; 0).`;
+          statusText.innerHTML = `<strong>W ≤ 0:</strong> una máquina frigorífica necesita trabajo de entrada (W &gt; 0).`;
         } else if (QL < 0) {
           status.classList.add('err');
           statusText.innerHTML = `<strong>MF imposible:</strong> Q<sub>L</sub> &lt; 0 con estos parámetros. Violación del 1° principio.`;
+        } else if (dXU_mf > 0.5) {
+          status.classList.add('err');
+          statusText.innerHTML = `<strong>MF imposible:</strong> COP (${fmt(COPreal,2)}) supera el límite de Carnot (${fmt(COPcarnot,2)}). Viola el 2° principio (ΔX<sub>U</sub> &gt; 0).`;
         } else if (Math.abs(dXU_mf) < 0.5) {
           status.classList.add('ok');
           statusText.innerHTML = `<strong>Reversible (Carnot):</strong> ΔX<sub>U</sub> ≈ 0. COP = ${fmt(COPreal,2)} · operás en el límite teórico.`;
