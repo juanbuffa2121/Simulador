@@ -94,11 +94,11 @@ body::before {
 .panel-sub { font-size: 14px; color: var(--t-3); margin-bottom: 28px; font-weight: 300; }
 
 /* ── SIMULATOR ── */
-.sim-grid { display: grid; grid-template-columns: 1.1fr 0.9fr 1fr; gap: 14px; align-items: start; }
+.sim-grid { display: grid; grid-template-columns: 1.3fr 0.85fr 0.85fr; gap: 14px; align-items: start; }
 @media (max-width: 1200px) { .sim-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 800px) { .sim-grid { grid-template-columns: 1fr; } }
 
-.sim-canvas { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 16px; position: sticky; top: 70px; }
+.sim-canvas { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 20px; position: sticky; top: 70px; }
 @media (max-width: 1200px) { .sim-canvas { position: static; } }
 .sim-canvas svg { width: 100%; height: auto; display: block; }
 
@@ -108,10 +108,8 @@ body::before {
 .sim-status.err { background: rgba(248,113,113,0.10); border: 1px solid rgba(248,113,113,0.25); color: var(--err); }
 .sim-status-icon { width: 18px; height: 18px; flex-shrink: 0; }
 
-.sim-controls { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 22px 20px; position: sticky; top: 70px; max-height: calc(100vh - 80px); overflow-y: auto; scrollbar-width: thin; }
-.sim-controls::-webkit-scrollbar { width: 5px; }
-.sim-controls::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
-@media (max-width: 1200px) { .sim-controls { position: static; max-height: none; overflow-y: visible; } }
+.sim-controls { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 22px 20px; }
+@media (max-width: 1200px) { .sim-controls { } }
 .sim-section { margin-bottom: 22px; }
 .sim-section:last-child { margin-bottom: 0; }
 .sim-section-h { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--t-3); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
@@ -133,10 +131,8 @@ body::before {
 .sim-mode-btn { flex: 1; background: none; border: none; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--t-2); padding: 7px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .sim-mode-btn.active { background: var(--bg-3); color: var(--a); }
 
-.sim-results { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 18px 16px; position: sticky; top: 70px; max-height: calc(100vh - 80px); overflow-y: auto; scrollbar-width: thin; }
-.sim-results::-webkit-scrollbar { width: 5px; }
-.sim-results::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
-@media (max-width: 1200px) { .sim-results { position: static; max-height: none; overflow-y: visible; } }
+.sim-results { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 18px 16px; }
+@media (max-width: 1200px) { .sim-results { } }
 .sim-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .sim-result-tile { background: var(--bg-1); border: 1px solid var(--b-1); border-radius: var(--r-md); padding: 14px 16px; }
 .sim-result-tile.full { grid-column: 1 / -1; }
@@ -297,61 +293,61 @@ footer .heart { color: var(--a); }
 
         <!-- Fuente caliente -->
         <rect x="140" y="30" width="320" height="80" rx="12" fill="url(#hotGrad)" stroke="#f87171" stroke-width="1.8" id="rectTop"/>
-        <text x="300" y="62" text-anchor="middle" fill="#f87171" font-family="Fraunces" font-size="15" font-weight="500" id="lblTopName">FUENTE CALIENTE</text>
-        <text x="300" y="84" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="13" id="lblTH">T_H = 600 K</text>
-        <text x="300" y="100" text-anchor="middle" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" id="lblQH">Q_H entrega 1000 kJ</text>
+        <text x="300" y="60" text-anchor="middle" fill="#f87171" font-family="Fraunces" font-size="18" font-weight="500" id="lblTopName">FUENTE CALIENTE</text>
+        <text x="300" y="82" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="15" id="lblTH">T_H = 600 K</text>
+        <text x="300" y="100" text-anchor="middle" fill="var(--t-3)" font-family="JetBrains Mono" font-size="12" id="lblQH">Q_H entrega 1000 kJ</text>
 
         <!-- Flecha Q_H bajando -->
         <line id="arrowQH" x1="300" y1="115" x2="300" y2="195" stroke="#f87171" stroke-width="6" marker-end="url(#simAr)" color="#f87171"/>
-        <text x="320" y="160" fill="#f87171" font-family="JetBrains Mono" font-size="12" font-weight="500" id="lblQHval">Q_H</text>
+        <text x="322" y="160" fill="#f87171" font-family="JetBrains Mono" font-size="14" font-weight="500" id="lblQHval">Q_H</text>
 
         <!-- Punto muerto T_0 -->
         <line id="t0line" x1="60" y1="170" x2="540" y2="170" stroke="var(--t-3)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
-        <text x="50" y="174" text-anchor="end" fill="var(--t-3)" font-family="JetBrains Mono" font-size="10" id="lblT0">T_0 = 298 K</text>
-        <text x="550" y="174" fill="var(--t-3)" font-family="JetBrains Mono" font-size="10" id="lblP0">P_0 = 101 kPa</text>
+        <text x="50" y="174" text-anchor="end" fill="var(--t-3)" font-family="JetBrains Mono" font-size="12" id="lblT0">T_0 = 298 K</text>
+        <text x="550" y="174" fill="var(--t-3)" font-family="JetBrains Mono" font-size="12" id="lblP0">P_0 = 101 kPa</text>
 
         <!-- Máquina térmica -->
         <circle cx="300" cy="245" r="50" fill="url(#mtGrad)" stroke="#fbbf24" stroke-width="2" id="circMT"/>
-        <text x="300" y="240" text-anchor="middle" fill="#fbbf24" font-family="Fraunces" font-size="14" font-weight="500" id="lblMTname">MT</text>
-        <text x="300" y="258" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="11" id="lblEta">η = 40,0%</text>
+        <text x="300" y="240" text-anchor="middle" fill="#fbbf24" font-family="Fraunces" font-size="17" font-weight="500" id="lblMTname">MT</text>
+        <text x="300" y="258" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="13" id="lblEta">η = 40,0%</text>
 
         <!-- Flecha W -->
         <line id="arrowW" x1="350" y1="245" x2="490" y2="245" stroke="#4ade80" stroke-width="5" marker-end="url(#simAr)" color="#4ade80"/>
-        <text x="420" y="232" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="12" font-weight="500" id="lblWval">W</text>
+        <text x="420" y="232" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="14" font-weight="500" id="lblWval">W</text>
 
         <!-- Receptor del trabajo -->
         <rect x="490" y="218" width="70" height="54" rx="8" fill="rgba(74,222,128,0.18)" stroke="#4ade80" stroke-width="1.5" id="rectW"/>
-        <text x="525" y="240" text-anchor="middle" fill="#4ade80" font-family="Inter" font-size="9" font-weight="500" id="lblWrole">RECEPTOR</text>
-        <text x="525" y="258" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="11" id="lblW">400 kJ</text>
+        <text x="525" y="238" text-anchor="middle" fill="#4ade80" font-family="Inter" font-size="11" font-weight="500" id="lblWrole">RECEPTOR</text>
+        <text x="525" y="258" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="13" id="lblW">400 kJ</text>
 
         <!-- Flecha Q_L bajando -->
         <line id="arrowQL" x1="300" y1="295" x2="300" y2="375" stroke="#60a5fa" stroke-width="5" marker-end="url(#simAr)" color="#60a5fa"/>
-        <text x="320" y="340" fill="#60a5fa" font-family="JetBrains Mono" font-size="12" font-weight="500" id="lblQLval">Q_L</text>
+        <text x="322" y="340" fill="#60a5fa" font-family="JetBrains Mono" font-size="14" font-weight="500" id="lblQLval">Q_L</text>
 
         <!-- Fuente fría -->
         <rect x="140" y="380" width="320" height="80" rx="12" fill="url(#coldGrad)" stroke="#60a5fa" stroke-width="1.8" id="rectBot"/>
-        <text x="300" y="412" text-anchor="middle" fill="#60a5fa" font-family="Fraunces" font-size="15" font-weight="500" id="lblBotName">FUENTE FRÍA</text>
-        <text x="300" y="434" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="13" id="lblTL">T_L = 300 K</text>
-        <text x="300" y="450" text-anchor="middle" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" id="lblQL">Q_L recibe 600 kJ</text>
+        <text x="300" y="410" text-anchor="middle" fill="#60a5fa" font-family="Fraunces" font-size="18" font-weight="500" id="lblBotName">FUENTE FRÍA</text>
+        <text x="300" y="432" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="15" id="lblTL">T_L = 300 K</text>
+        <text x="300" y="450" text-anchor="middle" fill="var(--t-3)" font-family="JetBrains Mono" font-size="12" id="lblQL">Q_L recibe 600 kJ</text>
 
         <!-- Indicadores de exergía (izquierda) -->
         <g id="exergyMarkers">
-          <text x="80" y="74" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔX_FH</text>
-          <text x="80" y="88" fill="#f87171" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exFH">−500</text>
-          <text x="80" y="245" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔX_W</text>
-          <text x="80" y="259" fill="#4ade80" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exW">+400</text>
-          <text x="80" y="424" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔX_FL</text>
-          <text x="80" y="438" fill="#60a5fa" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exFL">+4</text>
+          <text x="80" y="74" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" text-anchor="middle">ΔX_FH</text>
+          <text x="80" y="90" fill="#f87171" font-family="JetBrains Mono" font-size="13" font-weight="500" text-anchor="middle" id="exFH">−500</text>
+          <text x="80" y="242" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" text-anchor="middle">ΔX_W</text>
+          <text x="80" y="258" fill="#4ade80" font-family="JetBrains Mono" font-size="13" font-weight="500" text-anchor="middle" id="exW">+400</text>
+          <text x="80" y="422" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" text-anchor="middle">ΔX_FL</text>
+          <text x="80" y="438" fill="#60a5fa" font-family="JetBrains Mono" font-size="13" font-weight="500" text-anchor="middle" id="exFL">+4</text>
         </g>
 
         <!-- Indicadores de entropía (derecha) -->
         <g id="entropyMarkers">
-          <text x="520" y="74" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔS_FH</text>
-          <text x="520" y="88" fill="#f87171" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="enFH">−1,67</text>
-          <text x="520" y="245" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔS_W</text>
-          <text x="520" y="259" fill="#4ade80" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="enW">0</text>
-          <text x="520" y="424" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔS_FL</text>
-          <text x="520" y="438" fill="#60a5fa" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="enFL">+2,00</text>
+          <text x="520" y="74" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" text-anchor="middle">ΔS_FH</text>
+          <text x="520" y="90" fill="#f87171" font-family="JetBrains Mono" font-size="13" font-weight="500" text-anchor="middle" id="enFH">−1,67</text>
+          <text x="520" y="242" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" text-anchor="middle">ΔS_W</text>
+          <text x="520" y="258" fill="#4ade80" font-family="JetBrains Mono" font-size="13" font-weight="500" text-anchor="middle" id="enW">0</text>
+          <text x="520" y="422" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" text-anchor="middle">ΔS_FL</text>
+          <text x="520" y="438" fill="#60a5fa" font-family="JetBrains Mono" font-size="13" font-weight="500" text-anchor="middle" id="enFL">+2,00</text>
         </g>
       </svg>
 
