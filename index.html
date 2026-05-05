@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Exergía · Transformación de la Energía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0d14; --bg-1: #0f131d; --bg-2: #161b27; --bg-3: #1d2433; --bg-4: #262e40;
+  --b-1: rgba(255,255,255,0.06); --b-2: rgba(255,255,255,0.10); --b-3: rgba(255,255,255,0.16);
+  --t-1: #ebeef5; --t-2: #a4abbf; --t-3: #6b7387; --t-4: #444b5e;
+  --a: #f0843d; --a-2: #ffac6f; --a-3: #ffd2a8;
+  --a-d: rgba(240,132,61,0.12); --a-d2: rgba(240,132,61,0.22); --a-d3: rgba(240,132,61,0.04);
+  --t-exg: #3d1a1d; --t-exg-fg: #f07585;
+  --ok: #4ade80; --warn: #fbbf24; --err: #f87171; --info: #60a5fa;
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  --bg: #faf8f3; --bg-1: #f4f1e8; --bg-2: #ffffff; --bg-3: #fbf9f3; --bg-4: #ede8d8;
+  --b-1: rgba(0,0,0,0.06); --b-2: rgba(0,0,0,0.10); --b-3: rgba(0,0,0,0.20);
+  --t-1: #1a1d24; --t-2: #525766; --t-3: #818794; --t-4: #b0b5c0;
+  --a: #c66020; --a-2: #e87a30;
+  --a-d: rgba(198,96,32,0.10); --a-d2: rgba(198,96,32,0.18); --a-d3: rgba(198,96,32,0.04);
+  --t-exg: #fadcdf; --t-exg-fg: #a01e2d;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background: var(--bg); color: var(--t-1);
+  font-size: 15px; line-height: 1.6; min-height: 100vh;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  transition: background 0.3s, color 0.3s;
+}
+
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 15% 0%, var(--a-d3) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 85% 100%, rgba(95,208,196,0.04) 0%, transparent 50%);
+}
+
+::selection { background: var(--a-d2); color: var(--a-2); }
+[data-theme="light"] ::selection { background: var(--a-d2); color: var(--a); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bg-4); }
+
+.app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,13,20,0.85);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--b-1);
+  margin: 0 -28px 0 -28px; padding: 0 28px;
+}
+[data-theme="light"] .topbar { background: rgba(250,248,243,0.88); }
+.topbar-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 16px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; letter-spacing: -0.01em; color: var(--t-1); white-space: nowrap; }
+.brand-logo { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--a) 0%, var(--a-2) 100%); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; color: white; font-weight: 600; font-size: 14px; font-style: italic; }
+.brand-sub { color: var(--t-3); font-weight: 400; font-style: italic; font-size: 14px; }
+.topbar-spacer { flex: 1; }
+.topbar-btn { background: none; border: 1px solid var(--b-2); color: var(--t-2); font-family: inherit; font-size: 12px; font-weight: 500; padding: 7px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.18s var(--ease); }
+.topbar-btn:hover { border-color: var(--b-3); color: var(--t-1); background: var(--bg-2); }
+.topbar-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.theme-toggle { width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+/* ── HERO ── */
+.hero { padding: 48px 0 28px; position: relative; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--a); background: var(--a-d); border: 1px solid var(--a-d2); padding: 6px 14px; border-radius: 100px; margin-bottom: 24px; }
+.hero-eyebrow::before { content: ''; width: 6px; height: 6px; background: var(--a); border-radius: 50%; box-shadow: 0 0 0 3px var(--a-d), 0 0 8px var(--a-2); animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+.hero-title { font-family: 'Fraunces', serif; font-size: clamp(32px, 5vw, 48px); font-weight: 400; line-height: 1.1; letter-spacing: -0.025em; color: var(--t-1); margin-bottom: 12px; }
+.hero-title em { font-style: italic; background: linear-gradient(120deg, var(--a) 0%, var(--a-2) 50%, var(--a-3) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-sub { font-size: 15px; color: var(--t-2); max-width: 640px; font-weight: 300; line-height: 1.55; }
+
+/* ── PANEL ── */
+.panel { animation: fadeUp 0.4s var(--ease-out) both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.panel-h { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 500; letter-spacing: -0.015em; margin-bottom: 6px; color: var(--t-1); }
+.panel-h em { font-style: italic; color: var(--a-2); }
+.panel-sub { font-size: 14px; color: var(--t-3); margin-bottom: 28px; font-weight: 300; }
+
+/* ── SIMULATOR ── */
+.sim-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 900px) { .sim-grid { grid-template-columns: 1fr; } }
+
+.sim-canvas { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 20px; position: sticky; top: 80px; }
+@media (max-width: 900px) { .sim-canvas { position: static; } }
+.sim-canvas svg { width: 100%; height: auto; display: block; }
+
+.sim-status { margin-top: 14px; padding: 12px 14px; border-radius: var(--r-md); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; transition: all 0.3s; }
+.sim-status.ok { background: rgba(74,222,128,0.10); border: 1px solid rgba(74,222,128,0.25); color: var(--ok); }
+.sim-status.warn { background: rgba(251,191,36,0.10); border: 1px solid rgba(251,191,36,0.25); color: var(--warn); }
+.sim-status.err { background: rgba(248,113,113,0.10); border: 1px solid rgba(248,113,113,0.25); color: var(--err); }
+.sim-status-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+.sim-controls { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 22px 24px; }
+.sim-section { margin-bottom: 22px; }
+.sim-section:last-child { margin-bottom: 0; }
+.sim-section-h { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--t-3); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.sim-section-h::before { content: ''; width: 12px; height: 1px; background: var(--a); }
+
+.sim-input-group { margin-bottom: 14px; }
+.sim-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.sim-input-label { font-size: 13px; color: var(--t-1); flex: 1; display: flex; align-items: baseline; gap: 6px; }
+.sim-input-label .desc { font-size: 11px; color: var(--t-3); font-weight: 300; }
+.sim-input { width: 90px; background: var(--bg-1); border: 1px solid var(--b-1); border-radius: 6px; padding: 6px 9px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--t-1); outline: none; transition: all 0.2s; text-align: right; }
+.sim-input:focus { border-color: var(--a-d2); box-shadow: 0 0 0 2px var(--a-d3); }
+.sim-input-unit { font-size: 11px; color: var(--t-3); font-family: 'JetBrains Mono', monospace; min-width: 22px; }
+.sim-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; background: var(--bg-3); border-radius: 2px; outline: none; cursor: pointer; }
+.sim-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; background: var(--a); border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 3px var(--bg-2); transition: all 0.15s; }
+.sim-slider::-webkit-slider-thumb:hover { transform: scale(1.15); box-shadow: 0 0 0 3px var(--bg-2), 0 0 8px var(--a-d2); }
+.sim-slider::-moz-range-thumb { width: 14px; height: 14px; background: var(--a); border: none; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 3px var(--bg-2); }
+
+.sim-mode { display: flex; gap: 4px; padding: 3px; background: var(--bg-1); border: 1px solid var(--b-1); border-radius: 8px; margin-bottom: 14px; }
+.sim-mode-btn { flex: 1; background: none; border: none; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--t-2); padding: 7px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.sim-mode-btn.active { background: var(--bg-3); color: var(--a); }
+
+.sim-results { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); padding: 22px 24px; margin-top: 18px; }
+.sim-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sim-result-tile { background: var(--bg-1); border: 1px solid var(--b-1); border-radius: var(--r-md); padding: 14px 16px; }
+.sim-result-tile.full { grid-column: 1 / -1; }
+.sim-result-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--t-3); font-weight: 600; margin-bottom: 5px; }
+.sim-result-val { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 500; color: var(--t-1); letter-spacing: -0.015em; line-height: 1.2; }
+.sim-result-val .unit { font-size: 13px; color: var(--t-3); margin-left: 4px; font-family: 'JetBrains Mono', monospace; }
+.sim-result-val.pos { color: var(--ok); }
+.sim-result-val.neg { color: var(--err); }
+.sim-result-extra { font-size: 11px; color: var(--t-3); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+.exergy-bars { margin-top: 16px; }
+.exergy-bar-row { display: grid; grid-template-columns: 130px 1fr 80px; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 12px; }
+.exergy-bar-label { color: var(--t-2); }
+.exergy-bar-track { height: 22px; background: var(--bg-1); border: 1px solid var(--b-1); border-radius: 4px; position: relative; overflow: hidden; }
+.exergy-bar-zero { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--t-3); left: 50%; opacity: 0.5; }
+.exergy-bar-fill { position: absolute; top: 0; bottom: 0; transition: all 0.4s var(--ease); }
+.exergy-bar-fill.pos { background: linear-gradient(90deg, transparent, rgba(74,222,128,0.8)); }
+.exergy-bar-fill.neg { background: linear-gradient(270deg, transparent, rgba(248,113,113,0.8)); }
+.exergy-bar-val { font-family: 'JetBrains Mono', monospace; text-align: right; color: var(--t-1); font-size: 12px; }
+
+/* ── THEORY CARD (for notes) ── */
+.theory-card { background: var(--bg-2); border: 1px solid var(--b-1); border-radius: var(--r-lg); overflow: hidden; transition: border-color 0.2s; }
+.theory-card:hover { border-color: var(--b-2); }
+.theory-body { padding: 22px 24px 26px; }
+.t-section { margin-bottom: 22px; }
+.t-section:last-child { margin-bottom: 0; }
+.t-section-h { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--t-3); margin-bottom: 10px; }
+.t-text { font-size: 14px; color: var(--t-2); line-height: 1.7; font-weight: 300; }
+.t-text strong { color: var(--t-1); font-weight: 500; }
+.t-text em { font-style: italic; color: var(--a-2); }
+.t-list { list-style: none; margin: 10px 0; }
+.t-list li { padding-left: 22px; position: relative; margin-bottom: 8px; font-size: 14px; color: var(--t-2); line-height: 1.6; font-weight: 300; }
+.t-list li::before { content: ''; position: absolute; left: 6px; top: 10px; width: 4px; height: 4px; background: var(--a); border-radius: 50%; }
+.t-list li strong { color: var(--t-1); font-weight: 500; }
+.t-callout { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.18); border-left: 3px solid var(--err); border-radius: var(--r-md); padding: 14px 16px; margin: 14px 0; }
+.t-callout.warn { background: rgba(251,191,36,0.06); border-color: rgba(251,191,36,0.18); border-left-color: var(--warn); }
+.t-callout.info { background: rgba(96,165,250,0.06); border-color: rgba(96,165,250,0.18); border-left-color: var(--info); }
+.t-callout-h { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--err); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.t-callout.warn .t-callout-h { color: var(--warn); }
+.t-callout.info .t-callout-h { color: var(--info); }
+.t-callout-text { font-size: 13.5px; color: var(--t-2); line-height: 1.6; }
+.t-callout-text strong { color: var(--t-1); font-weight: 500; }
+
+.formula-inline { font-family: 'JetBrains Mono', monospace; font-size: 0.92em; background: var(--bg-3); padding: 1px 5px; border-radius: 3px; color: var(--a-2); }
+
+/* ── FOOTER ── */
+footer { margin-top: 80px; padding: 40px 0 60px; border-top: 1px solid var(--b-1); display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--t-3); }
+footer .heart { color: var(--a); }
+
+@media (max-width: 600px) {
+  .hide-mobile { display: none; }
+  .sim-result-grid { grid-template-columns: 1fr; }
+  .exergy-bar-row { grid-template-columns: 100px 1fr 70px; gap: 6px; font-size: 11px; }
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<div class="topbar">
+  <div class="topbar-inner app">
+    <div class="brand">
+      <div class="brand-logo">T</div>
+      <span>Simulador <span class="brand-sub">/ Exergía</span></span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <button class="topbar-btn theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Cambiar tema">
+      <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="app">
+
+<section class="hero">
+  <div class="hero-eyebrow">UBA · Transformación de la Energía</div>
+  <h1 class="hero-title">Simulador de <em>Exergía</em></h1>
+  <p class="hero-sub">Configurá las temperaturas de las fuentes, el calor entregado y el trabajo extraído. El cálculo de exergía se actualiza en tiempo real según el punto muerto que elijas.</p>
+</section>
+
+<!-- ═══════════════ SIMULADOR ═══════════════ -->
+<section class="panel" id="panel-simulador">
+
+  <div class="sim-grid">
+
+    <!-- ─── CANVAS (SVG) ─── -->
+    <div class="sim-canvas">
+      <svg viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg" id="svgSim">
+        <defs>
+          <marker id="simAr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+          <linearGradient id="hotGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#f87171" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#f87171" stop-opacity="0.18"/>
+          </linearGradient>
+          <linearGradient id="coldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.4"/>
+          </linearGradient>
+          <linearGradient id="mtGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#f0843d" stop-opacity="0.3"/>
+          </linearGradient>
+          <linearGradient id="mfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#c084f5" stop-opacity="0.3"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Fuente caliente -->
+        <rect x="140" y="30" width="320" height="80" rx="12" fill="url(#hotGrad)" stroke="#f87171" stroke-width="1.8" id="rectTop"/>
+        <text x="300" y="62" text-anchor="middle" fill="#f87171" font-family="Fraunces" font-size="15" font-weight="500" id="lblTopName">FUENTE CALIENTE</text>
+        <text x="300" y="84" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="13" id="lblTH">T_H = 600 K</text>
+        <text x="300" y="100" text-anchor="middle" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" id="lblQH">Q_H entrega 1000 kJ</text>
+
+        <!-- Flecha Q_H bajando -->
+        <line id="arrowQH" x1="300" y1="115" x2="300" y2="195" stroke="#f87171" stroke-width="6" marker-end="url(#simAr)" color="#f87171"/>
+        <text x="320" y="160" fill="#f87171" font-family="JetBrains Mono" font-size="12" font-weight="500" id="lblQHval">Q_H</text>
+
+        <!-- Punto muerto T_0 -->
+        <line id="t0line" x1="60" y1="170" x2="540" y2="170" stroke="var(--t-3)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
+        <text x="50" y="174" text-anchor="end" fill="var(--t-3)" font-family="JetBrains Mono" font-size="10" id="lblT0">T_0 = 298 K</text>
+        <text x="550" y="174" fill="var(--t-3)" font-family="JetBrains Mono" font-size="10" id="lblP0">P_0 = 101 kPa</text>
+
+        <!-- Máquina térmica -->
+        <circle cx="300" cy="245" r="50" fill="url(#mtGrad)" stroke="#fbbf24" stroke-width="2" id="circMT"/>
+        <text x="300" y="240" text-anchor="middle" fill="#fbbf24" font-family="Fraunces" font-size="14" font-weight="500" id="lblMTname">MT</text>
+        <text x="300" y="258" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="11" id="lblEta">η = 40,0%</text>
+
+        <!-- Flecha W -->
+        <line id="arrowW" x1="350" y1="245" x2="490" y2="245" stroke="#4ade80" stroke-width="5" marker-end="url(#simAr)" color="#4ade80"/>
+        <text x="420" y="232" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="12" font-weight="500" id="lblWval">W</text>
+
+        <!-- Receptor del trabajo -->
+        <rect x="490" y="218" width="70" height="54" rx="8" fill="rgba(74,222,128,0.18)" stroke="#4ade80" stroke-width="1.5" id="rectW"/>
+        <text x="525" y="240" text-anchor="middle" fill="#4ade80" font-family="Inter" font-size="9" font-weight="500" id="lblWrole">RECEPTOR</text>
+        <text x="525" y="258" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="11" id="lblW">400 kJ</text>
+
+        <!-- Flecha Q_L bajando -->
+        <line id="arrowQL" x1="300" y1="295" x2="300" y2="375" stroke="#60a5fa" stroke-width="5" marker-end="url(#simAr)" color="#60a5fa"/>
+        <text x="320" y="340" fill="#60a5fa" font-family="JetBrains Mono" font-size="12" font-weight="500" id="lblQLval">Q_L</text>
+
+        <!-- Fuente fría -->
+        <rect x="140" y="380" width="320" height="80" rx="12" fill="url(#coldGrad)" stroke="#60a5fa" stroke-width="1.8" id="rectBot"/>
+        <text x="300" y="412" text-anchor="middle" fill="#60a5fa" font-family="Fraunces" font-size="15" font-weight="500" id="lblBotName">FUENTE FRÍA</text>
+        <text x="300" y="434" text-anchor="middle" fill="var(--t-1)" font-family="JetBrains Mono" font-size="13" id="lblTL">T_L = 300 K</text>
+        <text x="300" y="450" text-anchor="middle" fill="var(--t-3)" font-family="JetBrains Mono" font-size="11" id="lblQL">Q_L recibe 600 kJ</text>
+
+        <!-- Indicadores de exergía -->
+        <g id="exergyMarkers">
+          <text x="80" y="74" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔX_FH</text>
+          <text x="80" y="88" fill="#f87171" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exFH">−500</text>
+          <text x="80" y="245" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔX_W</text>
+          <text x="80" y="259" fill="#4ade80" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exW">+400</text>
+          <text x="80" y="424" fill="var(--t-3)" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ΔX_FL</text>
+          <text x="80" y="438" fill="#60a5fa" font-family="JetBrains Mono" font-size="11" font-weight="500" text-anchor="middle" id="exFL">+4</text>
+        </g>
+      </svg>
+
+      <div class="sim-status" id="simStatus">
+        <svg id="simStatusIcon" class="sim-status-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0;min-width:18px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span id="simStatusText">Configurá los parámetros para empezar</span>
+      </div>
+    </div>
+
+    <!-- ─── CONTROLS ─── -->
+    <div>
+      <div class="sim-controls">
+
+        <!-- Modo -->
+        <div class="sim-section">
+          <div class="sim-section-h">Modo de operación</div>
+          <div class="sim-mode">
+            <button class="sim-mode-btn active" data-mode="real">Real (defino W)</button>
+            <button class="sim-mode-btn" data-mode="carnot">Carnot (W = η_C · Q_H)</button>
+          </div>
+        </div>
+
+        <!-- Fuente caliente -->
+        <div class="sim-section">
+          <div class="sim-section-h" id="secHotLabel">Fuente caliente</div>
+          <div class="sim-input-group">
+            <div class="sim-input-row">
+              <span class="sim-input-label">T<sub>H</sub><span class="desc" id="descTH">temperatura</span></span>
+              <input type="number" class="sim-input" id="inTH" value="600" min="300" max="2000" step="10">
+              <span class="sim-input-unit">K</span>
+            </div>
+            <input type="range" class="sim-slider" id="slTH" value="600" min="300" max="2000" step="10">
+          </div>
+          <div class="sim-input-group">
+            <div class="sim-input-row">
+              <span class="sim-input-label">Q<sub>H</sub><span class="desc" id="descQH">calor entregado</span></span>
+              <input type="number" class="sim-input" id="inQH" value="1000" min="100" max="10000" step="50">
+              <span class="sim-input-unit">kJ</span>
+            </div>
+            <input type="range" class="sim-slider" id="slQH" value="1000" min="100" max="10000" step="50">
+          </div>
+          <div style="display:flex;gap:4px;padding:3px;background:var(--bg-1);border:1px solid var(--b-1);border-radius:8px;margin-top:6px" id="qLockRow">
+            <button class="sim-mode-btn active" data-qlock="qh" style="font-size:11px;padding:5px 10px">Fijar Q<sub>H</sub></button>
+            <button class="sim-mode-btn" data-qlock="ql" style="font-size:11px;padding:5px 10px">Fijar Q<sub>L</sub></button>
+          </div>
+        </div>
+
+        <!-- Fuente fría -->
+        <div class="sim-section">
+          <div class="sim-section-h" id="secColdLabel">Fuente fría</div>
+          <div class="sim-input-group">
+            <div class="sim-input-row">
+              <span class="sim-input-label">T<sub>L</sub><span class="desc">temperatura</span></span>
+              <input type="number" class="sim-input" id="inTL" value="300" min="100" max="2000" step="5">
+              <span class="sim-input-unit">K</span>
+            </div>
+            <input type="range" class="sim-slider" id="slTL" value="300" min="100" max="2000" step="5">
+          </div>
+          <div class="sim-input-group" id="qlGroup">
+            <div class="sim-input-row">
+              <span class="sim-input-label">Q<sub>L</sub><span class="desc" id="descQL">calor cedido</span></span>
+              <input type="number" class="sim-input" id="inQL" value="600" min="0" max="10000" step="50">
+              <span class="sim-input-unit">kJ</span>
+            </div>
+            <input type="range" class="sim-slider" id="slQL" value="600" min="0" max="10000" step="50">
+          </div>
+        </div>
+
+        <!-- Trabajo -->
+        <div class="sim-section">
+          <div class="sim-section-h" id="secWLabel">Trabajo extraído por la MT</div>
+          <div class="sim-input-group">
+            <div class="sim-input-row">
+              <span class="sim-input-label">W<span class="desc" id="descW">a definir</span></span>
+              <input type="number" class="sim-input" id="inW" value="400" min="0" step="10">
+              <span class="sim-input-unit">kJ</span>
+            </div>
+            <input type="range" class="sim-slider" id="slW" value="400" min="0" max="10000" step="10">
+          </div>
+        </div>
+
+        <!-- Punto muerto -->
+        <div class="sim-section">
+          <div class="sim-section-h">Punto muerto · estado de referencia</div>
+          <div class="sim-input-group">
+            <div class="sim-input-row">
+              <span class="sim-input-label">T<sub>0</sub><span class="desc">temp. ambiente</span></span>
+              <input type="number" class="sim-input" id="inT0" value="298" min="200" max="500" step="1">
+              <span class="sim-input-unit">K</span>
+            </div>
+            <input type="range" class="sim-slider" id="slT0" value="298" min="200" max="500" step="1">
+          </div>
+          <div class="sim-input-group">
+            <div class="sim-input-row">
+              <span class="sim-input-label">P<sub>0</sub><span class="desc">presión ambiente</span></span>
+              <input type="number" class="sim-input" id="inP0" value="101.3" min="50" max="200" step="0.1">
+              <span class="sim-input-unit">kPa</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Resultados -->
+      <div class="sim-results">
+        <div class="sim-section-h" style="margin-bottom:14px">Resultados energéticos</div>
+        <div class="sim-result-grid">
+          <div class="sim-result-tile">
+            <div class="sim-result-label" id="lblResEtaReal">η real (W/Q_H)</div>
+            <div class="sim-result-val" id="resEtaReal">40,0<span class="unit">%</span></div>
+          </div>
+          <div class="sim-result-tile">
+            <div class="sim-result-label" id="lblResEtaCarnot">η Carnot (límite)</div>
+            <div class="sim-result-val" id="resEtaCarnot">50,0<span class="unit">%</span></div>
+          </div>
+          <div class="sim-result-tile">
+            <div class="sim-result-label" id="lblResQL">Q_L cedido</div>
+            <div class="sim-result-val" id="resQL">600<span class="unit">kJ</span></div>
+          </div>
+          <div class="sim-result-tile">
+            <div class="sim-result-label" id="lblResRatio">η real / η Carnot</div>
+            <div class="sim-result-val" id="resRatio">80<span class="unit">%</span></div>
+          </div>
+        </div>
+
+        <div class="sim-section-h" style="margin:22px 0 14px">Balance de exergía</div>
+
+        <div class="exergy-bars" id="exergyBars">
+          <div class="exergy-bar-row">
+            <span class="exergy-bar-label">ΔX fuente caliente</span>
+            <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill neg" id="bFH" style="width:0;right:50%"></div></div>
+            <span class="exergy-bar-val" id="vFH">−</span>
+          </div>
+          <div class="exergy-bar-row">
+            <span class="exergy-bar-label">ΔX receptor de W</span>
+            <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill pos" id="bW" style="width:0;left:50%"></div></div>
+            <span class="exergy-bar-val" id="vW">−</span>
+          </div>
+          <div class="exergy-bar-row">
+            <span class="exergy-bar-label">ΔX fuente fría</span>
+            <div class="exergy-bar-track"><div class="exergy-bar-zero"></div><div class="exergy-bar-fill pos" id="bFL" style="width:0;left:50%"></div></div>
+            <span class="exergy-bar-val" id="vFL">−</span>
+          </div>
+        </div>
+
+        <div class="sim-result-grid" style="margin-top:18px">
+          <div class="sim-result-tile full">
+            <div class="sim-result-label">ΔX universo (suma)</div>
+            <div class="sim-result-val" id="resDXU">0<span class="unit">kJ</span></div>
+            <div class="sim-result-extra" id="resDXUextra">2° principio: ΔX_U ≤ 0</div>
+          </div>
+          <div class="sim-result-tile">
+            <div class="sim-result-label">Destrucción de exergía</div>
+            <div class="sim-result-val" id="resDestr">0<span class="unit">kJ</span></div>
+          </div>
+          <div class="sim-result-tile">
+            <div class="sim-result-label">Rendimiento exergético</div>
+            <div class="sim-result-val" id="resEtaX">100<span class="unit">%</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Notas didácticas -->
+  <div class="theory-card" style="margin-top:18px">
+    <div class="theory-body">
+      <div class="t-section">
+        <div class="t-section-h">Cómo se calcula la exergía de cada componente</div>
+        <ul class="t-list">
+          <li><strong>Fuente caliente</strong> (cede Q<sub>H</sub>): pierde exergía. <span class="formula-inline">ΔX<sub>FH</sub> = −(1 − T<sub>0</sub>/T<sub>H</sub>) · Q<sub>H</sub></span>. Cuanto más alta T<sub>H</sub> respecto de T<sub>0</sub>, más exergía pierde por cada kJ de calor entregado.</li>
+          <li><strong>Receptor del trabajo</strong> (recibe W): gana exergía pura. <span class="formula-inline">ΔX<sub>W</sub> = +W</span>. El trabajo es 100% exergía.</li>
+          <li><strong>Fuente fría</strong> (recibe Q<sub>L</sub>): el signo depende. Si T<sub>L</sub> &gt; T<sub>0</sub>, gana exergía positiva pequeña; si T<sub>L</sub> = T<sub>0</sub>, no gana nada (calor a temperatura ambiente, sin valor); si T<sub>L</sub> &lt; T<sub>0</sub>, pierde porque está más cerca del ambiente que antes.</li>
+        </ul>
+      </div>
+      <div class="t-callout info">
+        <div class="t-callout-h">💡 Cómo experimentar</div>
+        <div class="t-callout-text">Empezá moviendo <strong>T<sub>0</sub></strong>: cuando T<sub>0</sub> se acerca a T<sub>H</sub>, la fuente caliente pierde menos exergía (su capacidad de producir trabajo es menor). Probá modo <strong>Carnot</strong>: deberías ver ΔX<sub>U</sub> ≈ 0. Después pasá a <strong>Real</strong> y bajá W: vas a ver cómo aparece destrucción de exergía. Si subís W por encima del límite de Carnot, el sistema marca <strong>imposible</strong> (violaría el 2° principio). <strong>Modo MF:</strong> si ponés T<sub>L</sub> &gt; T<sub>H</sub> el simulador cambia automáticamente a máquina frigorífica — el trabajo W ahora entra al sistema para bombear calor del foco frío al caliente, y los resultados muestran COP en vez de rendimiento.</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  <div>Hecho con <span class="heart">♥</span> para los alumnos</div>
+</footer>
+
+</div><!-- .app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════════════════════════════
+function loadTheme() {
+  const saved = localStorage.getItem('transfo-theme');
+  if (saved) document.body.dataset.theme = saved;
+  updateThemeIcon();
+}
+function toggleTheme() {
+  document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('transfo-theme', document.body.dataset.theme);
+  updateThemeIcon();
+}
+function updateThemeIcon() {
+  const dark = document.body.dataset.theme === 'dark';
+  document.getElementById('iconMoon').style.display = dark ? 'block' : 'none';
+  document.getElementById('iconSun').style.display  = dark ? 'none'  : 'block';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SIMULATOR
+// ═══════════════════════════════════════════════════════════════════
+function setupSimulator() {
+  const inputs = {
+    TH: document.getElementById('inTH'), slTH: document.getElementById('slTH'),
+    QH: document.getElementById('inQH'), slQH: document.getElementById('slQH'),
+    TL: document.getElementById('inTL'), slTL: document.getElementById('slTL'),
+    QL: document.getElementById('inQL'), slQL: document.getElementById('slQL'),
+    W:  document.getElementById('inW'),  slW:  document.getElementById('slW'),
+    T0: document.getElementById('inT0'), slT0: document.getElementById('slT0'),
+    P0: document.getElementById('inP0')
+  };
+  let mode = 'real';
+  let lockQH = true, lockQL = false;
+
+  function pairSync(numEl, slEl) {
+    if (!numEl || !slEl) return;
+    numEl.addEventListener('input', () => { slEl.value = numEl.value; recalc(); });
+    slEl.addEventListener('input',  () => { numEl.value = slEl.value;  recalc(); });
+  }
+  pairSync(inputs.TH, inputs.slTH);
+  pairSync(inputs.QH, inputs.slQH);
+  pairSync(inputs.TL, inputs.slTL);
+  pairSync(inputs.QL, inputs.slQL);
+  pairSync(inputs.W,  inputs.slW);
+  pairSync(inputs.T0, inputs.slT0);
+  inputs.P0.addEventListener('input', recalc);
+
+  const btnQH = document.querySelector('[data-qlock="qh"]');
+  const btnQL = document.querySelector('[data-qlock="ql"]');
+
+  function applyQLock() {
+    btnQH.classList.toggle('active', lockQH);
+    btnQL.classList.toggle('active', lockQL);
+    inputs.QH.disabled  = !lockQH; inputs.slQH.disabled  = !lockQH;
+    inputs.QL.disabled  = !lockQL; inputs.slQL.disabled  = !lockQL;
+    inputs.QH.closest('.sim-input-group').style.opacity = lockQH ? '1' : '0.45';
+    inputs.QL.closest('.sim-input-group').style.opacity = lockQL ? '1' : '0.45';
+    recalc();
+  }
+
+  btnQH.addEventListener('click', () => { lockQH = !lockQH; applyQLock(); });
+  btnQL.addEventListener('click', () => { lockQL = !lockQL; applyQLock(); });
+  applyQLock();
+
+  document.querySelectorAll('.sim-mode-btn[data-mode]').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.sim-mode-btn[data-mode]').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      mode = b.dataset.mode;
+      const wRow = inputs.W.closest('.sim-section');
+      if (mode==='carnot') {
+        inputs.W.disabled = true; inputs.slW.disabled = true;
+        wRow.style.opacity = '0.5';
+      } else {
+        inputs.W.disabled = false; inputs.slW.disabled = false;
+        wRow.style.opacity = '1';
+      }
+      recalc();
+    });
+  });
+
+  function fmt(v, dec=0, sign=false) {
+    if (!isFinite(v)) return '—';
+    const s = (sign && v>0 ? '+' : '') + v.toFixed(dec).replace('.',',');
+    return s;
+  }
+  function fmtSign(v, dec=0) {
+    if (!isFinite(v)) return '—';
+    return (v>=0 ? '+' : '') + v.toFixed(dec).replace('.',',');
+  }
+
+  function recalc() {
+    const TH = +inputs.TH.value, TL = +inputs.TL.value, T0 = +inputs.T0.value;
+    const QH = +inputs.QH.value, P0 = +inputs.P0.value;
+    const $ = (id) => document.getElementById(id);
+
+    const isMF = TL > TH;
+
+    if (isMF) {
+      $('secHotLabel').textContent    = 'Foco caliente (recibe Q_H)';
+      $('secColdLabel').textContent   = 'Foco frío (entrega Q_L)';
+      $('secWLabel').textContent      = 'Trabajo suministrado a la MF';
+      $('descQH').textContent         = 'calor recibido por el foco caliente';
+      $('descW').textContent          = 'trabajo de entrada';
+      $('lblTopName').textContent     = 'FOCO CALIENTE';
+      $('lblTopName').setAttribute('fill','#f87171');
+      $('lblBotName').textContent     = 'FOCO FRÍO';
+      $('lblBotName').setAttribute('fill','#60a5fa');
+      $('lblMTname').textContent      = 'MF';
+      $('lblMTname').setAttribute('fill','#60a5fa');
+      $('circMT').setAttribute('stroke','#60a5fa');
+      $('circMT').setAttribute('fill','url(#mfGrad)');
+      $('rectW').setAttribute('fill','rgba(96,165,250,0.18)');
+      $('rectW').setAttribute('stroke','#60a5fa');
+      $('lblWrole').textContent = 'FUENTE W';
+      $('lblWrole').setAttribute('fill','#60a5fa');
+      $('lblWval').setAttribute('fill','#60a5fa');
+      $('lblResEtaReal').textContent   = 'COP real (Q_L/W)';
+      $('lblResEtaCarnot').textContent = 'COP Carnot (límite)';
+      $('lblResQL').textContent        = 'Q_L absorbido del frío';
+      $('lblResRatio').textContent     = 'COP real / COP Carnot';
+    } else {
+      $('secHotLabel').textContent    = 'Fuente caliente';
+      $('secColdLabel').textContent   = 'Fuente fría';
+      $('secWLabel').textContent      = 'Trabajo extraído por la MT';
+      $('descQH').textContent         = 'calor entregado';
+      $('descW').textContent          = 'a definir';
+      $('lblTopName').textContent     = 'FUENTE CALIENTE';
+      $('lblTopName').setAttribute('fill','#f87171');
+      $('lblBotName').textContent     = 'FUENTE FRÍA';
+      $('lblBotName').setAttribute('fill','#60a5fa');
+      $('lblMTname').textContent      = 'MT';
+      $('lblMTname').setAttribute('fill','#fbbf24');
+      $('circMT').setAttribute('stroke','#fbbf24');
+      $('circMT').setAttribute('fill','url(#mtGrad)');
+      $('rectW').setAttribute('fill','rgba(74,222,128,0.18)');
+      $('rectW').setAttribute('stroke','#4ade80');
+      $('lblWrole').textContent = 'RECEPTOR';
+      $('lblWrole').setAttribute('fill','#4ade80');
+      $('lblWval').setAttribute('fill','#4ade80');
+      $('lblResEtaReal').textContent   = 'η real (W/Q_H)';
+      $('lblResEtaCarnot').textContent = 'η Carnot (límite)';
+      $('lblResQL').textContent        = 'Q_L cedido';
+      $('lblResRatio').textContent     = 'η real / η Carnot';
+    }
+
+    let W;
+
+    if (isMF) {
+      const T_cold = TH, T_hot = TL;
+      const COPcarnot = (T_hot > T_cold && T_cold > 0) ? T_cold / (T_hot - T_cold) : 0;
+
+      if (mode === 'carnot') {
+        W = COPcarnot > 0 ? QH / (COPcarnot + 1) : QH;
+        inputs.W.value = W.toFixed(0);
+        inputs.slW.value = W.toFixed(0);
+      } else {
+        W = +inputs.W.value;
+      }
+
+      let resolvedQH_mf, resolvedQL_mf;
+      if (lockQH && lockQL) {
+        resolvedQH_mf = +inputs.QH.value;
+        resolvedQL_mf = +inputs.QL.value;
+      } else if (lockQL) {
+        resolvedQL_mf = +inputs.QL.value;
+        resolvedQH_mf = resolvedQL_mf + W;
+        inputs.QH.value = resolvedQH_mf.toFixed(0);
+        inputs.slQH.value = resolvedQH_mf.toFixed(0);
+      } else {
+        resolvedQH_mf = +inputs.QH.value;
+        resolvedQL_mf = resolvedQH_mf - W;
+        inputs.QL.value = resolvedQL_mf.toFixed(0);
+        inputs.slQL.value = resolvedQL_mf.toFixed(0);
+      }
+      const QL = resolvedQL_mf;
+      const QHmf = resolvedQH_mf;
+      const COPreal = W > 0 ? QL / W : 0;
+
+      $('lblTH').textContent  = `T fría = ${fmt(T_cold)} K`;
+      $('lblTL').textContent  = `T caliente = ${fmt(T_hot)} K`;
+      $('lblQH').textContent  = `Q_H recibe ${fmt(QHmf)} kJ`;
+      $('lblQL').textContent  = `Q_L entrega ${fmt(QL)} kJ`;
+      $('lblT0').textContent  = `T_0 = ${fmt(T0)} K`;
+      $('lblP0').textContent  = `P_0 = ${fmt(P0,1)} kPa`;
+      $('lblEta').textContent = `COP = ${fmt(COPreal,2)}`;
+      $('lblQHval').textContent = `${fmt(QHmf)} kJ`;
+      $('lblQLval').textContent = `${fmt(QL)} kJ`;
+      $('lblWval').textContent  = `W = ${fmt(W)} kJ`;
+      $('lblW').textContent     = `${fmt(W)} kJ`;
+
+      const maxQ = Math.max(QHmf, Math.abs(QL), Math.abs(W), 1);
+      const wScale = (val) => Math.max(2, Math.min(16, (Math.abs(val)/maxQ) * 14 + 2));
+      $('arrowQH').setAttribute('stroke-width', wScale(QHmf));
+      $('arrowQH').setAttribute('stroke','#f87171');
+      $('arrowQH').setAttribute('x1', 300); $('arrowQH').setAttribute('y1', 195);
+      $('arrowQH').setAttribute('x2', 300); $('arrowQH').setAttribute('y2', 115);
+
+      $('arrowQL').setAttribute('stroke-width', wScale(QL));
+      $('arrowQL').setAttribute('stroke','#60a5fa');
+      $('arrowQL').setAttribute('x1', 300); $('arrowQL').setAttribute('y1', 375);
+      $('arrowQL').setAttribute('x2', 300); $('arrowQL').setAttribute('y2', 295);
+
+      $('arrowW').setAttribute('stroke-width', wScale(W));
+      $('arrowW').setAttribute('stroke','#60a5fa');
+      $('arrowW').setAttribute('color','#60a5fa');
+      $('arrowW').setAttribute('x1', 490); $('arrowW').setAttribute('y1', 245);
+      $('arrowW').setAttribute('x2', 350); $('arrowW').setAttribute('y2', 245);
+
+      const dXFL_mf = -(1 - T0/T_cold) * QL;
+      const dXW_mf  = -W;
+      const dXFH_mf = (1 - T0/T_hot) * QHmf;
+      const dXU_mf  = dXFL_mf + dXW_mf + dXFH_mf;
+      const destruccion_mf = Math.max(0, -dXU_mf);
+
+      $('exFH').textContent = fmtSign(dXFH_mf);
+      $('exFL').textContent = fmtSign(dXFL_mf);
+      $('exW').textContent  = fmtSign(dXW_mf);
+
+      $('resEtaReal').innerHTML   = `${fmt(COPreal,2).replace('.',',')}<span class="unit"> </span>`;
+      $('resEtaCarnot').innerHTML = `${fmt(COPcarnot,2).replace('.',',')}<span class="unit"> </span>`;
+      $('resQL').innerHTML        = `${fmt(QL)}<span class="unit">kJ</span>`;
+      const ratio_mf = COPcarnot > 0 ? COPreal / COPcarnot : 0;
+      $('resRatio').innerHTML     = `${(ratio_mf*100).toFixed(0).replace('.',',')}<span class="unit">%</span>`;
+
+      const maxX_mf = Math.max(Math.abs(dXFH_mf), Math.abs(dXFL_mf), Math.abs(dXW_mf), 1);
+      const updateBarMF = (id, valId, val) => {
+        const bar = $(id), valEl = $(valId);
+        const pct = Math.min(50, Math.abs(val) / maxX_mf * 50);
+        if (val >= 0) {
+          bar.classList.remove('neg'); bar.classList.add('pos');
+          bar.style.left = '50%'; bar.style.right = ''; bar.style.width = pct + '%';
+        } else {
+          bar.classList.remove('pos'); bar.classList.add('neg');
+          bar.style.right = '50%'; bar.style.left = ''; bar.style.width = pct + '%';
+        }
+        valEl.textContent = fmtSign(val) + ' kJ';
+      };
+      updateBarMF('bFH', 'vFH', dXFH_mf);
+      updateBarMF('bFL', 'vFL', dXFL_mf);
+      updateBarMF('bW',  'vW',  dXW_mf);
+
+      $('resDXU').className = 'sim-result-val ' + (Math.abs(dXU_mf) < 0.5 ? '' : (dXU_mf < 0 ? 'neg' : 'pos'));
+      $('resDXU').innerHTML = `${fmtSign(dXU_mf,1)}<span class="unit">kJ</span>`;
+      $('resDestr').innerHTML = `${fmt(destruccion_mf,1)}<span class="unit">kJ</span>`;
+      const xGanada_mf = Math.max(0, dXFH_mf);
+      const xPerdida_mf = Math.max(0,-dXFL_mf) + Math.max(0,-dXW_mf);
+      const etaX_mf = xPerdida_mf > 0 ? xGanada_mf / xPerdida_mf : 0;
+      $('resEtaX').innerHTML  = `${(etaX_mf*100).toFixed(1).replace('.',',')}<span class="unit">%</span>`;
+
+      const status = $('simStatus'), statusText = $('simStatusText');
+      status.classList.remove('ok','warn','err');
+      if (lockQH && lockQL) {
+        const WimplicadoMF = resolvedQH_mf - resolvedQL_mf;
+        const discrepancia = Math.abs(WimplicadoMF - W);
+        if (discrepancia > 0.5) {
+          status.classList.add('err');
+          statusText.innerHTML = `<strong>MF inconsistente:</strong> con Q<sub>H</sub> = ${fmt(resolvedQH_mf)} kJ y Q<sub>L</sub> = ${fmt(resolvedQL_mf)} kJ, el 1° principio exige W = ${fmt(WimplicadoMF)} kJ, pero W configurado = ${fmt(W)} kJ. Ajustá W o desbloqueá Q<sub>H</sub>/Q<sub>L</sub>.`;
+        } else if (dXU_mf > 0.5) {
+          status.classList.add('err');
+          statusText.innerHTML = `<strong>MF imposible:</strong> COP (${fmt(COPreal,2)}) supera el límite de Carnot (${fmt(COPcarnot,2)}). Viola el 2° principio (ΔX<sub>U</sub> &gt; 0).`;
+        } else if (QL < 0) {
+          status.classList.add('err');
+          statusText.innerHTML = `<strong>MF imposible:</strong> Q<sub>L</sub> &lt; 0 con estos parámetros. Violación del 1° principio.`;
+        } else if (Math.abs(dXU_mf) < 0.5) {
+          status.classList.add('ok');
+          statusText.innerHTML = `<strong>Reversible (Carnot):</strong> ΔX<sub>U</sub> ≈ 0. COP = ${fmt(COPreal,2)} · operás en el límite teórico.`;
+        } else {
+          status.classList.add('warn');
+          statusText.innerHTML = `<strong>MF real (irreversible):</strong> se destruyen ${fmt(destruccion_mf,1)} kJ de exergía. ΔX<sub>U</sub> = ${fmtSign(dXU_mf,1)} kJ &lt; 0.`;
+        }
+      } else if (W <= 0) {
+        status.classList.add('err');
+        statusText.innerHTML = `<strong>W ≤ 0:</strong> una máquina frigorífica necesita trabajo de entrada (W &gt; 0).`;
+      } else if (QL < 0) {
+        status.classList.add('err');
+        statusText.innerHTML = `<strong>MF imposible:</strong> Q<sub>L</sub> &lt; 0 · W &gt; Q<sub>H</sub> · violación del 1° principio.`;
+      } else if (dXU_mf > 0.5) {
+        status.classList.add('err');
+        statusText.innerHTML = `<strong>MF imposible:</strong> COP (${fmt(COPreal,2)}) supera el límite de Carnot (${fmt(COPcarnot,2)}). Viola el 2° principio (ΔX<sub>U</sub> &gt; 0).`;
+      } else if (Math.abs(dXU_mf) < 0.5) {
+        status.classList.add('ok');
+        statusText.innerHTML = `<strong>Reversible (Carnot):</strong> ΔX<sub>U</sub> ≈ 0. COP = ${fmt(COPreal,2)} · operás en el límite teórico.`;
+      } else {
+        status.classList.add('warn');
+        statusText.innerHTML = `<strong>MF real (irreversible):</strong> se destruyen ${fmt(destruccion_mf,1)} kJ de exergía. ΔX<sub>U</sub> = ${fmtSign(dXU_mf,1)} kJ &lt; 0.`;
+      }
+
+    } else {
+      // ── MÁQUINA TÉRMICA ──
+      const etaCarnot = (TH > 0 && TL > 0 && TH > TL) ? 1 - TL/TH : 0;
+
+      if (mode === 'carnot') {
+        W = etaCarnot * QH;
+        inputs.W.value = W.toFixed(0);
+        inputs.slW.value = W.toFixed(0);
+        if (+inputs.slW.max < QH) inputs.slW.max = QH;
+      } else {
+        W = +inputs.W.value;
+      }
+
+      let resolvedQH = +inputs.QH.value, resolvedQL;
+      if (lockQH && lockQL) {
+        resolvedQH = +inputs.QH.value;
+        resolvedQL = +inputs.QL.value;
+      } else if (lockQL) {
+        resolvedQL = +inputs.QL.value;
+        resolvedQH = resolvedQL + W;
+        inputs.QH.value = resolvedQH.toFixed(0);
+        inputs.slQH.value = resolvedQH.toFixed(0);
+      } else {
+        resolvedQH = +inputs.QH.value;
+        resolvedQL = resolvedQH - W;
+        inputs.QL.value = resolvedQL.toFixed(0);
+        inputs.slQL.value = resolvedQL.toFixed(0);
+      }
+      const QL = resolvedQL;
+      const QHr = resolvedQH;
+      const etaReal = QHr > 0 ? W/QHr : 0;
+
+      const dXFH = -(1 - T0/TH) * QHr;
+      const dXW  = +W;
+      const dXFL = (1 - T0/TL) * QL;
+      const dXU = dXFH + dXW + dXFL;
+      const destruccion = Math.max(0, -dXU);
+      const xGanada = Math.max(0, dXW) + Math.max(0, dXFL);
+      const xPerdida = Math.max(0, -dXFH) + Math.max(0, -dXFL) + Math.max(0, -dXW);
+      const etaX = xPerdida > 0 ? (xGanada / xPerdida) : 0;
+
+      $('lblTH').textContent = `T_H = ${fmt(TH)} K`;
+      $('lblQH').textContent = `Q_H entrega ${fmt(QHr)} kJ`;
+      $('lblTL').textContent = `T_L = ${fmt(TL)} K`;
+      $('lblQL').textContent = `Q_L recibe ${fmt(QL)} kJ`;
+      $('lblT0').textContent = `T_0 = ${fmt(T0)} K`;
+      $('lblP0').textContent = `P_0 = ${fmt(P0,1)} kPa`;
+      $('lblEta').textContent = `η = ${(etaReal*100).toFixed(1).replace('.',',')}%`;
+      $('lblQHval').textContent = `${fmt(QHr)} kJ`;
+      $('lblQLval').textContent = `${fmt(QL)} kJ`;
+      $('lblWval').textContent  = `W = ${fmt(W)} kJ`;
+      $('lblW').textContent     = `${fmt(W)} kJ`;
+
+      $('arrowQH').setAttribute('stroke','#f87171');
+      $('arrowW').setAttribute('stroke','#4ade80');
+      $('arrowW').setAttribute('color','#4ade80');
+      $('arrowQL').setAttribute('stroke','#60a5fa');
+
+      const maxQ = Math.max(QHr, Math.abs(QL), Math.abs(W), 1);
+      const wScale = (val) => Math.max(2, Math.min(16, (Math.abs(val)/maxQ) * 14 + 2));
+      $('arrowQH').setAttribute('stroke-width', wScale(QH));
+      $('arrowQH').setAttribute('x1', 300); $('arrowQH').setAttribute('y1', 115);
+      $('arrowQH').setAttribute('x2', 300); $('arrowQH').setAttribute('y2', 195);
+      $('arrowQL').setAttribute('stroke-width', wScale(QL));
+      $('arrowW').setAttribute('stroke-width',  wScale(W));
+
+      if (QL < 0) {
+        $('arrowQL').setAttribute('x1', 300); $('arrowQL').setAttribute('y1', 375);
+        $('arrowQL').setAttribute('x2', 300); $('arrowQL').setAttribute('y2', 295);
+      } else {
+        $('arrowQL').setAttribute('x1', 300); $('arrowQL').setAttribute('y1', 295);
+        $('arrowQL').setAttribute('x2', 300); $('arrowQL').setAttribute('y2', 375);
+      }
+      if (W < 0) {
+        $('arrowW').setAttribute('x1', 490); $('arrowW').setAttribute('y1', 245);
+        $('arrowW').setAttribute('x2', 350); $('arrowW').setAttribute('y2', 245);
+      } else {
+        $('arrowW').setAttribute('x1', 350); $('arrowW').setAttribute('y1', 245);
+        $('arrowW').setAttribute('x2', 490); $('arrowW').setAttribute('y2', 245);
+      }
+
+      $('exFH').textContent = fmtSign(dXFH);
+      $('exFL').textContent = fmtSign(dXFL);
+      $('exW').textContent  = fmtSign(dXW);
+
+      $('resEtaReal').innerHTML   = `${(etaReal*100).toFixed(1).replace('.',',')}<span class="unit">%</span>`;
+      $('resEtaCarnot').innerHTML = `${(etaCarnot*100).toFixed(1).replace('.',',')}<span class="unit">%</span>`;
+      $('resQL').innerHTML        = `${fmt(QL)}<span class="unit">kJ</span>`;
+      const ratio = etaCarnot > 0 ? etaReal / etaCarnot : 0;
+      $('resRatio').innerHTML     = `${(ratio*100).toFixed(0).replace('.',',')}<span class="unit">%</span>`;
+
+      const maxX = Math.max(Math.abs(dXFH), Math.abs(dXFL), Math.abs(dXW), 1);
+      const updateBar = (id, valId, val) => {
+        const bar = $(id), valEl = $(valId);
+        const pct = Math.min(50, Math.abs(val) / maxX * 50);
+        if (val >= 0) {
+          bar.classList.remove('neg'); bar.classList.add('pos');
+          bar.style.left = '50%'; bar.style.right = ''; bar.style.width = pct + '%';
+        } else {
+          bar.classList.remove('pos'); bar.classList.add('neg');
+          bar.style.right = '50%'; bar.style.left = ''; bar.style.width = pct + '%';
+        }
+        valEl.textContent = fmtSign(val) + ' kJ';
+      };
+      updateBar('bFH', 'vFH', dXFH);
+      updateBar('bFL', 'vFL', dXFL);
+      updateBar('bW',  'vW',  dXW);
+
+      $('resDXU').className = 'sim-result-val ' + (Math.abs(dXU) < 0.5 ? '' : (dXU < 0 ? 'neg' : 'pos'));
+      $('resDXU').innerHTML = `${fmtSign(dXU,1)}<span class="unit">kJ</span>`;
+      $('resDestr').innerHTML = `${fmt(destruccion,1)}<span class="unit">kJ</span>`;
+      $('resEtaX').innerHTML  = `${(etaX*100).toFixed(1).replace('.',',')}<span class="unit">%</span>`;
+
+      const status = $('simStatus'), statusText = $('simStatusText');
+      status.classList.remove('ok','warn','err');
+      if (lockQH && lockQL) {
+        const WimplicadoMT = resolvedQH - resolvedQL;
+        const discrepancia = Math.abs(WimplicadoMT - W);
+        if (discrepancia > 0.5) {
+          status.classList.add('err');
+          statusText.innerHTML = `<strong>MT inconsistente:</strong> con Q<sub>H</sub> = ${fmt(resolvedQH)} kJ y Q<sub>L</sub> = ${fmt(resolvedQL)} kJ, el 1° principio exige W = ${fmt(WimplicadoMT)} kJ, pero W configurado = ${fmt(W)} kJ. Ajustá W o desbloqueá Q<sub>H</sub>/Q<sub>L</sub>.`;
+        } else if (dXU > 0.5) {
+          status.classList.add('err');
+          statusText.innerHTML = `<strong>MT imposible:</strong> W (${fmt(W)} kJ) supera el límite de Carnot (${(etaCarnot*QHr).toFixed(0)} kJ). Viola el 2° principio (ΔX<sub>U</sub> &gt; 0).`;
+        } else if (QL < 0) {
+          status.classList.add('err');
+          statusText.innerHTML = `<strong>MT imposible:</strong> Q<sub>L</sub> &lt; 0 con estos parámetros. Violación del 1° principio.`;
+        } else if (Math.abs(dXU) < 0.5) {
+          status.classList.add('ok');
+          statusText.innerHTML = `<strong>Reversible:</strong> ΔX<sub>U</sub> ≈ 0. Operando en el límite de Carnot.`;
+        } else {
+          status.classList.add('warn');
+          statusText.innerHTML = `<strong>MT real (irreversible):</strong> se destruyen ${fmt(destruccion,1)} kJ de exergía. ΔX<sub>U</sub> = ${fmtSign(dXU,1)} kJ &lt; 0.`;
+        }
+      } else if (W < 0) {
+        status.classList.add('warn');
+        statusText.innerHTML = `<strong>W &lt; 0:</strong> el sistema está consumiendo trabajo (modo MF/bomba de calor).`;
+      } else if (W > QHr + 0.01) {
+        status.classList.add('err');
+        statusText.innerHTML = `<strong>MT imposible:</strong> W &gt; Q<sub>H</sub> · violación del 1° principio.`;
+      } else if (dXU > 0.5) {
+        status.classList.add('err');
+        statusText.innerHTML = `<strong>MT imposible:</strong> W (${fmt(W)} kJ) supera el límite de Carnot (${(etaCarnot*QHr).toFixed(0)} kJ). Viola el 2° principio (ΔX<sub>U</sub> &gt; 0).`;
+      } else if (Math.abs(dXU) < 0.5) {
+        status.classList.add('ok');
+        statusText.innerHTML = `<strong>Reversible:</strong> ΔX<sub>U</sub> ≈ 0. Estás operando en el límite de Carnot, sin destrucción de exergía.`;
+      } else {
+        status.classList.add('warn');
+        statusText.innerHTML = `<strong>Real (irreversible):</strong> se destruyen ${fmt(destruccion,1)} kJ de exergía. ΔX<sub>U</sub> = ${fmtSign(dXU,1)} kJ &lt; 0.`;
+      }
+    }
+  }
+
+  recalc();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════
+function init() {
+  loadTheme();
+  setupSimulator();
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+</script>
+
+</body>
+</html>
